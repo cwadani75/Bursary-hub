@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
+import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
-import { CheckCircle, AlertCircle } from 'lucide-react';
-=======
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
 
 const Contact = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -13,12 +11,10 @@ const Contact = () => {
     subject: '',
     message: '',
   });
-<<<<<<< HEAD
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-=======
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -27,200 +23,174 @@ const Contact = () => {
     }));
   };
 
-<<<<<<< HEAD
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setSuccess('');
-    
+
     try {
-      const response = await apiService.createContact(formData);
-      setSuccess('Your message has been sent successfully!');
-      setFormData({
-        fullName: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: '',
-      });
+      await apiService.createContact(formData);
+      setSuccess('Message sent successfully! We will get back to you soon.');
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
     } catch (error) {
-      setError(error.message || 'Failed to send message');
+      setError(error.message || 'Failed to send message. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-md my-10 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
-      <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-6 text-center">Contact Us</h2>
-      
-      {/* Error and Success Messages */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center">
-          <AlertCircle className="w-5 h-5 mr-2" />
-          {error}
-        </div>
-      )}
-      
-      {success && (
-        <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center">
-          <CheckCircle className="w-5 h-5 mr-2" />
-          {success}
-        </div>
-      )}
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block font-medium text-gray-700 dark:text-gray-300">Full Name</label>
-=======
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Contact Message Submitted:', formData);
-    alert('Your message has been sent!');
-  };
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Contact Us
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+            </p>
+          </div>
 
-  return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md my-10">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Contact Us</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block font-medium text-gray-700">Full Name</label>
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-          <input
-            type="text"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
-<<<<<<< HEAD
-            className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-=======
-            className="w-full mt-1 p-2 border rounded-md"
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-            placeholder="Enter your full name"
-          />
-        </div>
-
-        <div>
-<<<<<<< HEAD
-          <label className="block font-medium text-gray-700 dark:text-gray-300">Email Address</label>
-=======
-          <label className="block font-medium text-gray-700">Email Address</label>
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-<<<<<<< HEAD
-            className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-=======
-            className="w-full mt-1 p-2 border rounded-md"
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-            placeholder="example@email.com"
-          />
-        </div>
-
-        <div>
-<<<<<<< HEAD
-          <label className="block font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
-=======
-          <label className="block font-medium text-gray-700">Phone Number</label>
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-<<<<<<< HEAD
-            className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-=======
-            className="w-full mt-1 p-2 border rounded-md"
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-            placeholder="+254712345678"
-          />
-        </div>
-
-        <div>
-<<<<<<< HEAD
-          <label className="block font-medium text-gray-700 dark:text-gray-300">Subject</label>
-=======
-          <label className="block font-medium text-gray-700">Subject</label>
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-          <input
-            type="text"
-            name="subject"
-            value={formData.subject}
-            onChange={handleChange}
-            required
-<<<<<<< HEAD
-            className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-            placeholder="What is this about?"
-=======
-            className="w-full mt-1 p-2 border rounded-md"
-            placeholder="Write the subject of your message"
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-          />
-        </div>
-
-        <div>
-<<<<<<< HEAD
-          <label className="block font-medium text-gray-700 dark:text-gray-300">Message</label>
-          <textarea
-            name="message"
-            value={formData.message}
-            onChange={handleChange}
-            required
-            rows="5"
-            className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-            placeholder="Please describe your inquiry or concern..."
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full text-white py-2 px-4 rounded-md transition-colors duration-200 font-medium flex items-center justify-center ${
-            loading 
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600'
-          }`}
-        >
-          {loading ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Sending...
-            </>
-          ) : (
-            'Send Message'
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-red-600 dark:text-red-400">{error}</p>
+            </div>
           )}
-        </button>
-=======
-          <label className="block font-medium text-gray-700">Message</label>
-          <textarea
-            name="message"
-            rows="4"
-            value={formData.message}
-            onChange={handleChange}
-            required
-            className="w-full mt-1 p-2 border rounded-md"
-            placeholder="Write your message here..."
-          />
-        </div>
 
-        <div className="text-center">
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
-          >
-            Send Message
-          </button>
+          {success && (
+            <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+              <p className="text-green-600 dark:text-green-400">{success}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
+                  placeholder="Enter your full name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
+                  placeholder="example@email.com"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
+                  placeholder="+254712345678"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Subject *
+                </label>
+                <input
+                  type="text"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
+                  placeholder="What is this about?"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Message *
+              </label>
+              <textarea
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                required
+                rows="6"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
+                placeholder="Tell us more about your inquiry..."
+              />
+            </div>
+
+            <div className="flex justify-center">
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-8 py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Sending...' : 'Send Message'}
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <div className="bg-indigo-100 dark:bg-indigo-900 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Address</h3>
+              <p className="text-gray-600 dark:text-gray-400">Dadaab, Garissa County, Kenya</p>
+            </div>
+
+            <div>
+              <div className="bg-indigo-100 dark:bg-indigo-900 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Email</h3>
+              <p className="text-gray-600 dark:text-gray-400">support@bursaryhub.org</p>
+            </div>
+
+            <div>
+              <div className="bg-indigo-100 dark:bg-indigo-900 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Phone</h3>
+              <p className="text-gray-600 dark:text-gray-400">+254 712 345 678</p>
+            </div>
+          </div>
         </div>
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-      </form>
+      </div>
     </div>
   );
 };

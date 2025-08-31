@@ -1,128 +1,149 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Users, Award, Shield, Heart } from 'lucide-react';
 
-function About() {
+const About = () => {
   return (
-<<<<<<< HEAD
-    <div className="bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto space-y-12">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-blue-700 dark:text-blue-400 mb-4">About BursaryHub</h1>
-          <p className="text-lg text-gray-700 dark:text-gray-300">
-=======
-    <div className="bg-gray-50 text-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto space-y-12">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-blue-700 mb-4">About BursaryHub</h1>
-          <p className="text-lg text-gray-700">
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-            BursaryHub is a digital platform designed to streamline the bursary application and management process across counties in Kenya. 
-            We aim to provide fair, fast, and transparent access to financial aid for all deserving students.
+    <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">About BursaryHub</h1>
+          <p className="text-xl md:text-2xl max-w-3xl mx-auto">
+            Empowering students across Kenya with accessible bursary opportunities
           </p>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          <div>
-<<<<<<< HEAD
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">🎯 Our Mission</h2>
-            <p className="text-gray-700 dark:text-gray-300">
-=======
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">🎯 Our Mission</h2>
-            <p className="text-gray-700">
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-              To ensure equal access to education by making bursary applications simple, accessible, and transparent to every student in need.
+      {/* Main Content */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Mission Statement */}
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-indigo-700 dark:text-indigo-400">
+              Our Mission
+            </h2>
+            <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-4xl mx-auto leading-relaxed">
+              BursaryHub is a digital platform designed to streamline the bursary application and management process across counties in Kenya. 
+              We aim to provide fair, fast, and transparent access to financial aid for all deserving students.
             </p>
           </div>
-          <div>
-<<<<<<< HEAD
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">🌍 Our Vision</h2>
-            <p className="text-gray-700 dark:text-gray-300">
-=======
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">🌍 Our Vision</h2>
-            <p className="text-gray-700">
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-              Empower every student with the financial support they need to pursue their academic goals and build a better future.
-            </p>
-          </div>
-        </div>
 
-<<<<<<< HEAD
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md text-center border border-gray-200 dark:border-gray-700">
-          <h3 className="text-xl font-bold text-green-600 dark:text-green-400 mb-4">📅 Application Status</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-2">
-            The bursary application process is currently <span className="text-green-700 dark:text-green-300 font-semibold">open</span> for submissions.
-          </p>
-          <p className="text-gray-600 dark:text-gray-400 mb-2">
-            Last review cycle was completed on <span className="font-semibold">31st July</span>.
-          </p>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Approved applicants will be notified via email and SMS before the end of the month.
-          </p>
-          <Link to="/apply">
-            <button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-6 py-2 rounded-full transition-colors duration-200">
-=======
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h3 className="text-xl font-bold text-green-600 mb-4">📅 Application Status</h3>
-          <p className="text-gray-600 mb-2">
-            The bursary application process is currently <span className="text-green-700 font-semibold">open</span> for submissions.
-          </p>
-          <p className="text-gray-600 mb-2">
-            Last review cycle was completed on <span className="font-semibold">31st July</span>.
-          </p>
-          <p className="text-gray-600 mb-4">
-            Approved applicants will be notified via email and SMS before the end of the month.
-          </p>
-          <Link to="/apply">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition">
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-              Apply for Bursary
-            </button>
-          </Link>
-        </div>
+          {/* Vision and Values */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-16">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
+              <h3 className="text-2xl font-bold mb-4 text-indigo-700 dark:text-indigo-400">Our Vision</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                To ensure equal access to education by making bursary applications simple, accessible, and transparent to every student in need.
+              </p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
+              <h3 className="text-2xl font-bold mb-4 text-indigo-700 dark:text-indigo-400">Our Goal</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                Empower every student with the financial support they need to pursue their academic goals and build a better future.
+              </p>
+            </div>
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-<<<<<<< HEAD
-          <div className="bg-white dark:bg-gray-900 p-4 shadow rounded border border-gray-200 dark:border-gray-700">
-            <h4 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">5,000+</h4>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">Students Helped</p>
+          {/* Call to Action */}
+          <div className="text-center mb-16">
+            <h3 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">
+              Ready to Start Your Journey?
+            </h3>
+            <Link to="/apply">
+              <button className="bg-indigo-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-indigo-700 transition-colors duration-300 shadow-lg hover:shadow-xl">
+                Apply for Bursary
+              </button>
+            </Link>
           </div>
-          <div className="bg-white dark:bg-gray-900 p-4 shadow rounded border border-gray-200 dark:border-gray-700">
-            <h4 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">15+</h4>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">Counties Covered</p>
-          </div>
-          <div className="bg-white dark:bg-gray-900 p-4 shadow rounded border border-gray-200 dark:border-gray-700">
-            <h4 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">95%</h4>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">Approval Rate</p>
-=======
-          <div className="bg-white p-4 shadow rounded">
-            <h4 className="text-3xl font-bold text-indigo-600">5,000+</h4>
-            <p className="text-gray-600 mt-1">Students Helped</p>
-          </div>
-          <div className="bg-white p-4 shadow rounded">
-            <h4 className="text-3xl font-bold text-indigo-600">15+</h4>
-            <p className="text-gray-600 mt-1">Counties Covered</p>
-          </div>
-          <div className="bg-white p-4 shadow rounded">
-            <h4 className="text-3xl font-bold text-indigo-600">95%</h4>
-            <p className="text-gray-600 mt-1">Approval Rate</p>
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-          </div>
-        </div>
 
-        <div className="text-center pt-8">
-          <Link to="/report">
-<<<<<<< HEAD
-            <button className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white px-8 py-2 rounded-lg transition-colors duration-200">
-=======
-            <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-2 rounded-lg transition">
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-              View Reports
-            </button>
-          </Link>
+          {/* Key Features */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            <div className="text-center p-6">
+              <div className="bg-indigo-100 dark:bg-indigo-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Student-Focused</h4>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                Designed with students in mind, making the application process simple and accessible.
+              </p>
+            </div>
+            <div className="text-center p-6">
+              <div className="bg-indigo-100 dark:bg-indigo-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Award className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Fair Selection</h4>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                Transparent criteria and fair selection process for all applicants.
+              </p>
+            </div>
+            <div className="text-center p-6">
+              <div className="bg-indigo-100 dark:bg-indigo-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Secure Platform</h4>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                Your data is protected with industry-standard security measures.
+              </p>
+            </div>
+            <div className="text-center p-6">
+              <div className="bg-indigo-100 dark:bg-indigo-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Community Support</h4>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                Supporting students from all backgrounds across Kenya.
+              </p>
+            </div>
+          </div>
+
+          {/* Statistics */}
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 mb-16">
+            <h3 className="text-2xl font-bold mb-8 text-center text-gray-800 dark:text-gray-200">
+              Our Impact
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              <div>
+                <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">12,500+</div>
+                <div className="text-gray-600 dark:text-gray-400">Students Helped</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">47</div>
+                <div className="text-gray-600 dark:text-gray-400">Counties Covered</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">KSh 2.5B+</div>
+                <div className="text-gray-600 dark:text-gray-400">Funds Disbursed</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">94%</div>
+                <div className="text-gray-600 dark:text-gray-400">Success Rate</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Final CTA */}
+          <div className="text-center">
+            <h3 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">
+              Need Help or Have Questions?
+            </h3>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/contact">
+                <button className="bg-gray-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-700 transition-colors duration-300">
+                  Contact Us
+                </button>
+              </Link>
+              <Link to="/report">
+                <button className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors duration-300">
+                  Report an Issue
+                </button>
+              </Link>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
-}
+};
 
 export default About;

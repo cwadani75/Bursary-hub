@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -27,7 +26,7 @@ function App() {
       try {
         const token = apiService.getToken();
         const userData = apiService.getUser();
-        
+
         if (token && userData) {
           // Validate the token with the server
           const isValid = await apiService.validateToken();
@@ -81,9 +80,9 @@ function App() {
       {/* Only show navbar and footer for non-admin pages */}
       {!isAuthenticated || user?.role !== 'admin' ? (
         <>
-          <Navbar 
-            user={user} 
-            onLogout={handleLogout} 
+          <Navbar
+            user={user}
+            onLogout={handleLogout}
             isAuthenticated={isAuthenticated}
             setIsAuthenticated={setIsAuthenticated}
             setUser={setUser}
@@ -92,55 +91,55 @@ function App() {
           <main className="min-h-screen">
             <Routes>
               {/* Public routes - redirect to login if not authenticated */}
-              <Route 
-                path="/" 
+              <Route
+                path="/"
                 element={
-                  isAuthenticated ? 
-                    <Home /> : 
+                  isAuthenticated ?
+                    <Home /> :
                     <Navigate to="/login" replace />
-                } 
+                }
               />
-              <Route 
-                path="/about" 
+              <Route
+                path="/about"
                 element={
-                  isAuthenticated ? 
-                    <About /> : 
+                  isAuthenticated ?
+                    <About /> :
                     <Navigate to="/login" replace />
-                } 
+                }
               />
-              <Route 
-                path="/contact" 
+              <Route
+                path="/contact"
                 element={
-                  isAuthenticated ? 
-                    <Contact /> : 
+                  isAuthenticated ?
+                    <Contact /> :
                     <Navigate to="/login" replace />
-                } 
+                }
               />
-              
+
               {/* Authentication routes */}
-              <Route 
-                path="/login" 
+              <Route
+                path="/login"
                 element={
-                  isAuthenticated ? 
-                    <Navigate to="/" replace /> : 
+                  isAuthenticated ?
+                    <Navigate to="/" replace /> :
                     <Login setIsAuthenticated={setIsAuthenticated} setUser={setUser} />
-                } 
+                }
               />
-              <Route 
-                path="/signup" 
+              <Route
+                path="/signup"
                 element={
-                  isAuthenticated ? 
-                    <Navigate to="/" replace /> : 
+                  isAuthenticated ?
+                    <Navigate to="/" replace /> :
                     <Signup />
-                } 
+                }
               />
-              <Route 
-                path="/forgot-password" 
+              <Route
+                path="/forgot-password"
                 element={
-                  isAuthenticated ? 
-                    <Navigate to="/" replace /> : 
+                  isAuthenticated ?
+                    <Navigate to="/" replace /> :
                     <ForgotPassword />
-                } 
+                }
               />
               <Route
                 path="/admin/login"
@@ -150,7 +149,7 @@ function App() {
                     <AdminLogin setIsAuthenticated={setIsAuthenticated} setUser={setUser} />
                 }
               />
-              
+
               {/* Protected routes */}
               <Route
                 path="/apply"
@@ -176,7 +175,7 @@ function App() {
                     <Navigate to="/login" replace />
                 }
               />
-              
+
               {/* Catch all route */}
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
@@ -195,44 +194,6 @@ function App() {
         </Routes>
       )}
     </div>
-=======
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import Home from './pages/Home';
-import About from './pages/About';
-import Apply from './Forms/Apply';
-import Report from './Forms/Report';
-import Contact from './Forms/Contact';
-import ThemeToggle from './components/ThemeToggle'; // ✅ import
-
-function App() {
-  return (
-    <>
-      {/* Place theme toggle wherever you want */}
-      <ThemeToggle />
-
-      <Navbar />
-
-      <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/apply" element={<Apply />} />
-          <Route path="/report" element={<Report />} />
-          <Route path="/contact" element={<Contact />} />
-        </Routes>
-
-        {/* Example block to test dark mode */}
-        <div className="bg-white text-black dark:bg-gray-900 dark:text-white p-6">
-          <h1>Hello Duniaaaa</h1>
-        </div>
-      </main>
-
-      <Footer />
-    </>
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
   );
 }
 

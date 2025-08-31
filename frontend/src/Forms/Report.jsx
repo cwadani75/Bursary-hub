@@ -1,273 +1,199 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
-import { CheckCircle, AlertCircle } from 'lucide-react';
-=======
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
 
-function Report() {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    county: '',
-    subCounty: '',
-    ward: '',
-    village: '',
-    reportType: '',
-    reason: '',
-    description: ''
-  });
-<<<<<<< HEAD
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const navigate = useNavigate();
-=======
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
+const Report = () => {
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        fullName: '',
+        email: '',
+        phone: '',
+        county: '',
+        subCounty: '',
+        ward: '',
+        village: '',
+        reportType: '',
+        reason: '',
+        description: ''
+    });
 
-  const counties = ['Nairobi', 'Garissa', 'Mombasa'];
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
-  const subCounties = {
-    Nairobi: ['Westlands', 'Kasarani', 'Langata'],
-    Garissa: ['Dadaab', 'Balambala', 'Lagdera'],
-    Mombasa: ['Changamwe', 'Likoni', 'Kisauni']
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
 
-  const wards = {
-    Westlands: ['Parklands', 'Kangemi'],
-    Kasarani: ['Roysambu', 'Clay City'],
-    Langata: ['Karen', 'South C'],
-    Dadaab: ['Hagadera', 'Ifo'],
-    Balambala: ['Tetu', 'Bulla'],
-    Lagdera: ['Modogashe', 'Sabena'],
-    Changamwe: ['Port Reitz', 'Airport'],
-    Likoni: ['Mtongwe', 'Shika Adabu'],
-    Kisauni: ['Mtopanga', 'Magogoni']
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        setSuccess('');
 
-  const villages = {
-    Parklands: ['Village A', 'Village B'],
-    Kangemi: ['Village C', 'Village D'],
-    Hagadera: ['Block A_5', 'Block B_2'],
-    Ifo: ['Sector 1', 'Sector 2'],
-    // Port Reitz: ['Mtaa 1', 'Mtaa 2'],
-    Airport: ['Runway', 'Control']
-  };
+        try {
+            await apiService.createReport(formData);
+            setSuccess('Report submitted successfully!');
+            setTimeout(() => {
+                navigate('/');
+            }, 2000);
+        } catch (error) {
+            setError(error.message || 'Failed to submit report. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+    return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+                    <div className="text-center mb-8">
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                            Report an Issue
+                        </h1>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            Help us improve by reporting any issues or concerns you encounter
+                        </p>
+                    </div>
 
-    // Reset dependent fields when a parent is changed
-    if (name === 'county') {
-      setFormData({ ...formData, county: value, subCounty: '', ward: '', village: '' });
-    } else if (name === 'subCounty') {
-      setFormData({ ...formData, subCounty: value, ward: '', village: '' });
-    } else if (name === 'ward') {
-      setFormData({ ...formData, ward: value, village: '' });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
+                    {error && (
+                        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                            <p className="text-red-600 dark:text-red-400">{error}</p>
+                        </div>
+                    )}
 
-<<<<<<< HEAD
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setSuccess('');
-    
-    try {
-      // Check if user is authenticated
-      if (!apiService.isAuthenticated()) {
-        setError("Please login to submit a report");
-        setLoading(false);
-        return;
-      }
-      
-      // Prepare report data
-      const reportData = {
-        title: formData.reason,
-        description: formData.description,
-        reportType: formData.reportType,
-        reason: formData.reason,
-        county: formData.county,
-        subCounty: formData.subCounty,
-        ward: formData.ward,
-        village: formData.village
-      };
-      
-      const response = await apiService.createReport(reportData);
-      setSuccess("✅ Report submitted successfully!");
-      
-      // Redirect to home page after 2 seconds
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
-      
-    } catch (error) {
-      setError(error.message || "Failed to submit report");
-    } finally {
-      setLoading(false);
-    }
-=======
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-    alert("✅ Report submitted successfully!");
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-  };
+                    {success && (
+                        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                            <p className="text-green-600 dark:text-green-400">{success}</p>
+                        </div>
+                    )}
 
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-8 bg-white rounded-lg shadow">
-      <h2 className="text-3xl font-bold text-center mb-6">Bursary Report Form</h2>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Full Name *
+                            </label>
+                            <input
+                                type="text"
+                                name="fullName"
+                                required
+                                value={formData.fullName}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
+                                placeholder="Enter your full name"
+                            />
+                        </div>
 
-<<<<<<< HEAD
-      {/* Error and Success Messages */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center">
-          <AlertCircle className="w-5 h-5 mr-2" />
-          {error}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
+                                placeholder="Enter your email"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Phone Number
+                            </label>
+                            <input
+                                type="tel"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
+                                placeholder="Enter your phone number"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                County *
+                            </label>
+                            <input
+                                type="text"
+                                name="county"
+                                required
+                                value={formData.county}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
+                                placeholder="Enter your county"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Report Type *
+                            </label>
+                            <select
+                                name="reportType"
+                                required
+                                value={formData.reportType}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
+                            >
+                                <option value="">Select Type</option>
+                                <option value="Fraud">Fraud</option>
+                                <option value="Delay">Delayed Response</option>
+                                <option value="Ineligibility">Ineligibility Concern</option>
+                                <option value="Corruption">Corruption</option>
+                                <option value="Technical">Technical Issue</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Reason / Title *
+                            </label>
+                            <input
+                                type="text"
+                                name="reason"
+                                required
+                                value={formData.reason}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
+                                placeholder="e.g. Suspected misuse of funds"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Detailed Explanation *
+                            </label>
+                            <textarea
+                                name="description"
+                                required
+                                rows="5"
+                                value={formData.description}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
+                                placeholder="Describe the issue clearly and provide any relevant details..."
+                            />
+                        </div>
+
+                        <div className="flex justify-center">
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="px-8 py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? 'Submitting...' : 'Submit Report'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-      )}
-      
-      {success && (
-        <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center">
-          <CheckCircle className="w-5 h-5 mr-2" />
-          {success}
-        </div>
-      )}
-
-=======
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-      <form onSubmit={handleSubmit} className="space-y-6">
-
-        {/* Full Name */}
-        <div>
-          <label className="block font-semibold">Full Name</label>
-          <input type="text" name="fullName" required onChange={handleChange}
-            className="w-full mt-1 border rounded px-4 py-2" />
-        </div>
-
-        {/* Email & Phone */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block font-semibold">Email</label>
-            <input type="email" name="email" onChange={handleChange}
-              className="w-full mt-1 border rounded px-4 py-2" />
-          </div>
-          <div>
-            <label className="block font-semibold">Phone Number</label>
-            <input type="tel" name="phone" onChange={handleChange}
-              className="w-full mt-1 border rounded px-4 py-2" />
-          </div>
-        </div>
-
-        {/* Location Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block font-semibold">County</label>
-            <select name="county" required value={formData.county}
-              onChange={handleChange} className="w-full mt-1 border rounded px-4 py-2">
-              <option value="">Select County</option>
-              {counties.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
-
-          <div>
-            <label className="block font-semibold">Sub-County</label>
-            <select name="subCounty" required value={formData.subCounty}
-              onChange={handleChange} className="w-full mt-1 border rounded px-4 py-2">
-              <option value="">Select Sub-County</option>
-              {(subCounties[formData.county] || []).map((sc) => (
-                <option key={sc} value={sc}>{sc}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block font-semibold">Ward</label>
-            <select name="ward" required value={formData.ward}
-              onChange={handleChange} className="w-full mt-1 border rounded px-4 py-2">
-              <option value="">Select Ward</option>
-              {(wards[formData.subCounty] || []).map((w) => (
-                <option key={w} value={w}>{w}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block font-semibold">Village</label>
-            <select name="village" required value={formData.village}
-              onChange={handleChange} className="w-full mt-1 border rounded px-4 py-2">
-              <option value="">Select Village</option>
-              {(villages[formData.ward] || []).map((v) => (
-                <option key={v} value={v}>{v}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Report Type & Reason */}
-        <div>
-          <label className="block font-semibold">Report Type</label>
-          <select name="reportType" required value={formData.reportType}
-            onChange={handleChange} className="w-full mt-1 border rounded px-4 py-2">
-            <option value="">Select Type</option>
-            <option value="Fraud">Fraud</option>
-            <option value="Delay">Delayed Response</option>
-            <option value="Ineligibility">Ineligibility Concern</option>
-            <option value="Corruption">Corruption</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block font-semibold">Reason / Title</label>
-          <input type="text" name="reason" required onChange={handleChange}
-            placeholder="e.g. Suspected misuse of funds"
-            className="w-full mt-1 border rounded px-4 py-2" />
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block font-semibold">Detailed Explanation</label>
-          <textarea name="description" required rows="5" onChange={handleChange}
-            className="w-full mt-1 border rounded px-4 py-2"
-            placeholder="Describe the issue clearly..." />
-        </div>
-
-        {/* Submit */}
-<<<<<<< HEAD
-        <button 
-          type="submit"
-          disabled={loading}
-          className={`w-full py-3 text-white font-semibold rounded transition flex items-center justify-center ${
-            loading 
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-red-600 hover:bg-red-700'
-          }`}
-        >
-          {loading ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Submitting...
-            </>
-          ) : (
-            'Submit Report'
-          )}
-=======
-        <button type="submit"
-          className="w-full py-3 bg-red-600 text-white font-semibold rounded hover:bg-red-700 transition">
-          Submit Report
->>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
-        </button>
-      </form>
-    </div>
-  );
-}
+    );
+};
 
 export default Report;
