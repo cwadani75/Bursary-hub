@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
 import { CheckCircle, AlertCircle } from 'lucide-react';
+=======
+>>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
 
 function Report() {
   const [formData, setFormData] = useState({
@@ -16,10 +19,13 @@ function Report() {
     reason: '',
     description: ''
   });
+<<<<<<< HEAD
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+=======
+>>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
 
   const counties = ['Nairobi', 'Garissa', 'Mombasa'];
 
@@ -65,6 +71,7 @@ function Report() {
     }
   };
 
+<<<<<<< HEAD
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -104,12 +111,19 @@ function Report() {
     } finally {
       setLoading(false);
     }
+=======
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(formData);
+    alert("✅ Report submitted successfully!");
+>>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
   };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 bg-white rounded-lg shadow">
       <h2 className="text-3xl font-bold text-center mb-6">Bursary Report Form</h2>
 
+<<<<<<< HEAD
       {/* Error and Success Messages */}
       {error && (
         <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center">
@@ -125,6 +139,8 @@ function Report() {
         </div>
       )}
 
+=======
+>>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
       <form onSubmit={handleSubmit} className="space-y-6">
 
         {/* Full Name */}
@@ -225,6 +241,7 @@ function Report() {
         </div>
 
         {/* Submit */}
+<<<<<<< HEAD
         <button 
           type="submit"
           disabled={loading}
@@ -242,6 +259,11 @@ function Report() {
           ) : (
             'Submit Report'
           )}
+=======
+        <button type="submit"
+          className="w-full py-3 bg-red-600 text-white font-semibold rounded hover:bg-red-700 transition">
+          Submit Report
+>>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
         </button>
       </form>
     </div>

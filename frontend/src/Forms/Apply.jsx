@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
 import apiService from "../services/api";
+=======
+>>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
 import {
   ChevronLeft,
   ChevronRight,
@@ -11,16 +14,22 @@ import {
   DollarSign,
   Upload,
   CheckCircle,
+<<<<<<< HEAD
   AlertCircle,
+=======
+>>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
 } from "lucide-react";
 
 const ApplyForm = () => {
   const [step, setStep] = useState(0);
+<<<<<<< HEAD
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   
+=======
+>>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -85,6 +94,7 @@ const ApplyForm = () => {
   const nextStep = () => setStep((prev) => Math.min(prev + 1, steps.length - 1));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 0));
 
+<<<<<<< HEAD
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -112,11 +122,18 @@ const ApplyForm = () => {
     } finally {
       setLoading(false);
     }
+=======
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Submitted:", formData);
+    alert("Application submitted successfully!");
+>>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
   };
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800 p-4 md:p-8">
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6">
+<<<<<<< HEAD
         {/* Error and Success Messages */}
         {error && (
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center">
@@ -131,6 +148,8 @@ const ApplyForm = () => {
             {success}
           </div>
         )}
+=======
+>>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
         {/* Step Indicators */}
         <div className="flex items-center justify-between mb-6">
           {steps.map((s, i) => (
@@ -369,6 +388,7 @@ const ApplyForm = () => {
             {step === steps.length - 1 && (
               <button
                 type="submit"
+<<<<<<< HEAD
                 disabled={loading}
                 className={`px-6 py-2 text-white rounded flex items-center ${
                   loading 
@@ -384,6 +404,11 @@ const ApplyForm = () => {
                 ) : (
                   'Submit'
                 )}
+=======
+                className="px-6 py-2 bg-green-600 text-white rounded"
+              >
+                Submit
+>>>>>>> 8ed9babf99ff1647a1bdde429ef8f15cc86c9a65
               </button>
             )}
           </div>
