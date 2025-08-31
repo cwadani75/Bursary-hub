@@ -1,0 +1,339 @@
+import React, { useEffect, useState } from 'react';
+import { SunIcon, MoonIcon, Bars3Icon, XMarkIcon, UserCircleIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/solid';
+import { Link } from 'react-router-dom';
+
+const Navbar = ({ user, onLogout, isAuthenticated, setIsAuthenticated, setUser }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+
+  const toggleMobileMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const toggleDarkMode = () => {
+    const html = document.documentElement;
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    
+    if (newMode) {
+      html.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      html.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+    
+    window.dispatchEvent(new Event('themeChange'));
+  };
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    let initialTheme;
+    if (storedTheme) {
+      initialTheme = storedTheme;
+    } else {
+      initialTheme = prefersDark ? 'dark' : 'light';
+    }
+    
+    const html = document.documentElement;
+    if (initialTheme === 'dark') {
+      html.classList.add('dark');
+      setIsDarkMode(true);
+    } else {
+      html.classList.remove('dark');
+      setIsDarkMode(false);
+    }
+    
+    if (!storedTheme) {
+      localStorage.setItem('theme', initialTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isMenuOpen && !event.target.closest('.mobile-menu')) {
+        setIsMenuOpen(false);
+      }
+      if (isUserDropdownOpen && !event.target.closest('.user-dropdown')) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMenuOpen, isUserDropdownOpen]);
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        if (isMenuOpen) {
+          setIsMenuOpen(false);
+        }
+        if (isUserDropdownOpen) {
+          setIsUserDropdownOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isMenuOpen, isUserDropdownOpen]);
+
+  const navLinks = [
+    { name: 'Home', href: '/' },
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
+    ...(isAuthenticated ? [
+      { name: 'Apply', href: '/apply' },
+      { name: 'Report', href: '/report' },
+      { name: 'Profile', href: '/profile' }
+    ] : []),
+    ...(isAuthenticated && user?.role === 'admin' ? [{ name: 'Admin Dashboard', href: '/admin' }] : [])
+  ];
+
+  const handleLogout = () => {
+    onLogout();
+    setIsMenuOpen(false);
+  };
+
+  return (
+    <>
+      {isMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
+
+      <nav className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-gray-900 text-gray-700 dark:text-white shadow-md z-50 transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <img src="/img/image.png" alt="Bursary Logo" className="h-8 w-8 sm:h-10 sm:w-10 object-contain" />
+            <span className="text-indigo-600 dark:text-white font-bold text-lg sm:text-xl">BursaryHub</span>
+          </Link>
+
+          <ul className="hidden md:flex items-center gap-8 text-sm font-medium">
+            {navLinks.map((link) => (
+              <li key={link.name}>
+                <Link 
+                  to={link.href}
+                  className="hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors duration-200 relative group"
+                >
+                  {link.name}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-500 dark:bg-indigo-300 transition-all duration-200 group-hover:w-full"></span>
+                </Link>
+              </li>
+            ))}
+      </ul>
+
+          <div className="flex items-center gap-3">
+            {isAuthenticated ? (
+              <>
+                {/* User Dropdown */}
+                <div className="hidden md:relative user-dropdown">
+                  <button
+                    onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                  >
+                    {user?.profile_picture ? (
+                      <img 
+                        src={`http://localhost:5001/uploads/${user.profile_picture}`} 
+                        alt="Profile" 
+                        className="h-8 w-8 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                      />
+                    ) : (
+                      <UserCircleIcon className="h-8 w-8 text-gray-400" />
+                    )}
+                    <div className="text-right">
+                      <p className="font-medium text-gray-900 dark:text-white text-sm leading-tight">{user?.name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 capitalize leading-tight">{user?.role}</p>
+                    </div>
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isUserDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
+                      <Link
+                        to="/profile"
+                        onClick={() => setIsUserDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        Profile Settings
+                      </Link>
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setIsUserDropdownOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="hidden md:flex items-center gap-3">
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              </>
+            )}
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
+                {isDarkMode ? 'Dark' : 'Light'}
+              </span>
+        <button
+          onClick={toggleDarkMode}
+                className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                aria-label="Toggle dark mode"
+        >
+          {isDarkMode ? (
+            <SunIcon className="h-5 w-5 text-yellow-400" />
+          ) : (
+            <MoonIcon className="h-5 w-5 text-gray-800 dark:text-white" />
+          )}
+        </button>
+            </div>
+
+        <button
+          onClick={toggleMobileMenu}
+              className="md:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              aria-label="Toggle mobile menu"
+            >
+              {isMenuOpen ? (
+                <XMarkIcon className="h-6 w-6" />
+              ) : (
+                <Bars3Icon className="h-6 w-6" />
+              )}
+        </button>
+          </div>
+      </div>
+
+      <div
+          className={`mobile-menu fixed top-16 right-0 w-80 h-full bg-white dark:bg-gray-900 shadow-xl transform transition-transform duration-300 ease-in-out md:hidden ${
+          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+          <div className="p-6 space-y-6">
+            {isAuthenticated ? (
+              <>
+                <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                  <div className="flex items-center gap-3">
+                    {user?.profile_picture ? (
+                      <img 
+                        src={`http://localhost:5001/uploads/${user.profile_picture}`} 
+                        alt="Profile" 
+                        className="h-12 w-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <UserCircleIcon className="h-12 w-12 text-gray-400" />
+                    )}
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-white">{user?.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{user?.role}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{user?.email}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <ul className="space-y-4">
+                  {navLinks.map((link) => (
+                    <li key={link.name}>
+                      <Link 
+                        to={link.href}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 text-base font-medium"
+                      >
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                  <div className="space-y-3">
+                    <Link 
+                      to="/profile"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block py-2 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+                    >
+                      Profile
+                    </Link>
+                    <Link 
+                      to="/settings"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block py-2 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+                    >
+                      Settings
+                    </Link>
+                    <button 
+                      onClick={handleLogout}
+                      className="w-full flex items-center justify-center gap-2 bg-red-500 text-white py-3 px-4 rounded-lg hover:bg-red-600 transition-colors duration-200 font-medium"
+                    >
+                      <ArrowRightStartOnRectangleIcon className="h-4 w-4" />
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <ul className="space-y-4">
+                  {navLinks.map((link) => (
+                    <li key={link.name}>
+                      <Link 
+                        to={link.href}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 text-base font-medium"
+                      >
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+          </ul>
+
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                  <div className="space-y-3">
+                    <Link
+                      to="/login"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block py-3 px-4 text-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-medium"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      to="/signup"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block py-3 px-4 text-center rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors duration-200 font-medium"
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
+          </div>
+              </>
+            )}
+        </div>
+      </div>
+    </nav>
+
+      <div className="h-16"></div>
+    </>
+  );
+};
+
+export default Navbar;
