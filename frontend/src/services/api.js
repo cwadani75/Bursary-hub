@@ -207,10 +207,10 @@ class ApiService {
     return response;
   }
 
-  async updateApplicationStatus(applicationId, status, adminNotes) {
+  async updateApplicationStatus(applicationId, status) {
     const response = await this.request(`/applications/${applicationId}`, {
       method: 'PUT',
-      body: JSON.stringify({ status, admin_notes: adminNotes }),
+      body: JSON.stringify({ status }),
     });
     return response;
   }

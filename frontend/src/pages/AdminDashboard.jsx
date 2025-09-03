@@ -48,6 +48,7 @@ const AdminDashboard = () => {
   const [reports, setReports] = useState([]);
   const [applications, setApplications] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [expandedApplication, setExpandedApplication] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,27 +71,27 @@ const AdminDashboard = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Load users
       const usersResponse = await apiService.getAllUsers();
       console.log('Users loaded:', usersResponse);
       setUsers(usersResponse.users || []);
-      
+
       // Load reports
       const reportsResponse = await apiService.getAllReports();
       console.log('Reports loaded:', reportsResponse);
       setReports(reportsResponse.reports || []);
-      
+
       // Load applications
       const applicationsResponse = await apiService.getAllApplications();
       console.log('Applications loaded:', applicationsResponse);
       setApplications(applicationsResponse.applications || []);
-      
+
       // Load contacts
       const contactsResponse = await apiService.getAllContacts();
       console.log('Contacts loaded:', contactsResponse);
       setContacts(contactsResponse.contacts || []);
-      
+
       // Calculate stats
       const totalUsers = usersResponse.users?.length || 0;
       const totalReports = reportsResponse.reports?.length || 0;
@@ -99,7 +100,7 @@ const AdminDashboard = () => {
       const totalApplications = applicationsResponse.applications?.length || 0;
       const pendingApplications = applicationsResponse.applications?.filter(a => a.status === 'pending').length || 0;
       const totalContacts = contactsResponse.contacts?.length || 0;
-      
+
       setStats({
         totalUsers,
         totalReports,
@@ -161,9 +162,9 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleUpdateApplicationStatus = async (applicationId, newStatus, adminNotes) => {
+  const handleUpdateApplicationStatus = async (applicationId, newStatus) => {
     try {
-      await apiService.updateApplicationStatus(applicationId, newStatus, adminNotes);
+      await apiService.updateApplicationStatus(applicationId, newStatus);
       await loadDashboardData(); // Reload data
     } catch (error) {
       console.error('Error updating application status:', error);
@@ -207,12 +208,12 @@ const AdminDashboard = () => {
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
-        
+
         <div className="relative text-center mb-8">
           <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-white to-indigo-100 bg-clip-text text-transparent">Dashboard Overview</h2>
           <p className="text-indigo-100 text-xl max-w-3xl mx-auto leading-relaxed">Comprehensive insights into your bursary management system performance and user activity</p>
         </div>
-        
+
         {/* Enhanced Stats Grid */}
         <div className="relative grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
           <div className="group bg-white/15 backdrop-blur-sm rounded-2xl p-6 text-center hover:bg-white/20 transition-all duration-300 hover:scale-105">
@@ -245,7 +246,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Modern Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 hover:shadow-2xl transition-all duration-500 hover:scale-105 relative overflow-hidden">
@@ -342,11 +343,10 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <span className={`px-3 py-1.5 text-sm font-medium rounded-xl ${
-                    report.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                  <span className={`px-3 py-1.5 text-sm font-medium rounded-xl ${report.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
                     report.status === 'resolved' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                    'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-                  }`}>
+                      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                    }`}>
                     {report.status}
                   </span>
                   <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
@@ -368,7 +368,7 @@ const AdminDashboard = () => {
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
-        
+
         <div className="relative flex items-center justify-between">
           <div>
             <h2 className="text-4xl font-bold mb-3 bg-gradient-to-r from-white to-indigo-100 bg-clip-text text-transparent">Manage Users</h2>
@@ -455,14 +455,14 @@ const AdminDashboard = () => {
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
-        
+
         <div className="relative flex items-center justify-between">
           <div>
             <h2 className="text-4xl font-bold mb-3 bg-gradient-to-r from-white to-indigo-100 bg-clip-text text-transparent">Manage Reports</h2>
             <p className="text-indigo-100 text-lg">Review and manage all submitted reports ({reports.length} reports loaded)</p>
           </div>
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={loadDashboardData}
               className="group px-6 py-4 bg-white/20 backdrop-blur-sm text-white rounded-2xl hover:bg-white/30 transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105"
             >
@@ -507,53 +507,53 @@ const AdminDashboard = () => {
                 </tr>
               ) : (
                 reports.map((report) => (
-                <tr key={report.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300">
-                  <td className="px-8 py-6 whitespace-nowrap">
-                    <div>
-                      <div className="text-lg font-semibold text-gray-900 dark:text-white">{report.title}</div>
-                      <div className="text-gray-600 dark:text-gray-400 max-w-xs truncate">{report.description}</div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-12 w-12">
-                        <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                          <Shield className="w-6 h-6 text-white" />
+                  <tr key={report.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300">
+                    <td className="px-8 py-6 whitespace-nowrap">
+                      <div>
+                        <div className="text-lg font-semibold text-gray-900 dark:text-white">{report.title}</div>
+                        <div className="text-gray-600 dark:text-gray-400 max-w-xs truncate">{report.description}</div>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-12 w-12">
+                          <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                            <Shield className="w-6 h-6 text-white" />
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-semibold text-gray-900 dark:text-white">{report.reporter_name}</div>
                         </div>
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-semibold text-gray-900 dark:text-white">{report.reporter_name}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6 whitespace-nowrap">
-                    <select
-                      value={report.status}
-                      onChange={(e) => handleUpdateReportStatus(report.id, e.target.value)}
-                      className="text-sm border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="reviewed">Reviewed</option>
-                      <option value="resolved">Resolved</option>
-                    </select>
-                  </td>
-                  <td className="px-8 py-6 whitespace-nowrap text-gray-600 dark:text-gray-400">
-                    {new Date(report.created_at).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </td>
-                  <td className="px-8 py-6 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleDeleteReport(report.id)}
-                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 px-4 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
+                    </td>
+                    <td className="px-8 py-6 whitespace-nowrap">
+                      <select
+                        value={report.status}
+                        onChange={(e) => handleUpdateReportStatus(report.id, e.target.value)}
+                        className="text-sm border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="reviewed">Reviewed</option>
+                        <option value="resolved">Resolved</option>
+                      </select>
+                    </td>
+                    <td className="px-8 py-6 whitespace-nowrap text-gray-600 dark:text-gray-400">
+                      {new Date(report.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </td>
+                    <td className="px-8 py-6 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={() => handleDeleteReport(report.id)}
+                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 px-4 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
@@ -599,58 +599,131 @@ const AdminDashboard = () => {
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {applications.map((application) => (
-                <tr key={application.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 group">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                          <Shield className="w-5 h-5 text-white" />
+                <React.Fragment key={application.id}>
+                  <tr className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 group">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+                            <Shield className="w-5 h-5 text-white" />
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            {application.first_name} {application.last_name}
+                          </div>
+                          <div className="text-xs text-gray-600 dark:text-gray-400">{application.email}</div>
                         </div>
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                          {application.first_name} {application.last_name}
-                        </div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">{application.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900 dark:text-white">{application.institution}</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">{application.course}</div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-semibold text-gray-900 dark:text-white">{application.institution}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">{application.course}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    KES {application.fee_amount?.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <select
-                      value={application.status}
-                      onChange={(e) => handleUpdateApplicationStatus(application.id, e.target.value)}
-                      className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="approved">Approved</option>
-                      <option value="rejected">Rejected</option>
-                    </select>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">
-                    {new Date(application.created_at).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xs font-medium">
-                    <button
-                      onClick={() => handleDeleteApplication(application.id)}
-                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      KES {application.fee_amount?.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <select
+                        value={application.status}
+                        onChange={(e) => handleUpdateApplicationStatus(application.id, e.target.value)}
+                        className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                      </select>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">
+                      {new Date(application.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-medium">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => setExpandedApplication(expandedApplication === application.id ? null : application.id)}
+                          className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 px-3 py-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all duration-300"
+                        >
+                          {expandedApplication === application.id ? 'Hide' : 'View'} Details
+                        </button>
+                        <button
+                          onClick={() => handleDeleteApplication(application.id)}
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  {/* Expanded Application Details */}
+                  {expandedApplication === application.id && (
+                    <tr>
+                      <td colSpan="6" className="px-6 py-4 bg-gray-50 dark:bg-gray-700">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {/* Personal Details */}
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-gray-900 dark:text-white text-sm border-b border-gray-200 dark:border-gray-600 pb-2">
+                              Personal Details
+                            </h4>
+                            <div className="space-y-2 text-xs">
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Full Name:</span> {application.first_name} {application.last_name}</div>
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Email:</span> {application.email}</div>
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Phone:</span> {application.phone}</div>
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">ID Number:</span> {application.id_number}</div>
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Gender:</span> {application.gender}</div>
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Date of Birth:</span> {application.dob}</div>
+                            </div>
+                          </div>
+
+                          {/* Location Details */}
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-gray-900 dark:text-white text-sm border-b border-gray-200 dark:border-gray-600 pb-2">
+                              Location
+                            </h4>
+                            <div className="space-y-2 text-xs">
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">County:</span> {application.county}</div>
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Sub-County:</span> {application.sub_county}</div>
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Ward:</span> {application.ward}</div>
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Village:</span> {application.village}</div>
+                            </div>
+                          </div>
+
+                          {/* Education Details */}
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-gray-900 dark:text-white text-sm border-b border-gray-200 dark:border-gray-600 pb-2">
+                              Education
+                            </h4>
+                            <div className="space-y-2 text-xs">
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Institution:</span> {application.institution}</div>
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Course:</span> {application.course}</div>
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Year of Study:</span> {application.year_of_study}</div>
+                            </div>
+                          </div>
+
+                          {/* Financial Details */}
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-gray-900 dark:text-white text-sm border-b border-gray-200 dark:border-gray-600 pb-2">
+                              Financial Information
+                            </h4>
+                            <div className="space-y-2 text-xs">
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Fee Amount:</span> KES {application.fee_amount?.toLocaleString()}</div>
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Family Income:</span> KES {application.family_income?.toLocaleString()}</div>
+                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Reason:</span> {application.reason}</div>
+                            </div>
+                          </div>
+
+
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
@@ -768,8 +841,8 @@ const AdminDashboard = () => {
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm" 
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           ></div>
         </div>
@@ -818,21 +891,20 @@ const AdminDashboard = () => {
                     className={`
                       w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg
                       transition-all duration-200 ease-out
-                      ${
-                        activeTab === item.id
-                          ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-200 shadow-sm border border-indigo-100 dark:border-indigo-800'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-300'
+                      ${activeTab === item.id
+                        ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-200 shadow-sm border border-indigo-100 dark:border-indigo-800'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-300'
                       }
                     `}
                   >
-                    <Icon 
+                    <Icon
                       className={`
                         w-5 h-5 mr-3 flex-shrink-0
-                        ${activeTab === item.id 
-                          ? 'text-indigo-600 dark:text-indigo-400' 
+                        ${activeTab === item.id
+                          ? 'text-indigo-600 dark:text-indigo-400'
                           : 'text-gray-500 dark:text-gray-500'
                         }
-                      `} 
+                      `}
                     />
                     <span>{item.label}</span>
                     {activeTab === item.id && (
@@ -859,7 +931,7 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </div>
-            
+
             <button
               onClick={handleLogout}
               className={`
@@ -887,7 +959,7 @@ const AdminDashboard = () => {
             >
               <Menu className="w-5 h-5" />
             </button>
-            
+
             <div className="flex items-center space-x-4">
               <div className="text-gray-600 dark:text-gray-400">
                 Welcome, <span className="font-medium text-gray-900 dark:text-white">Admin</span>
@@ -899,21 +971,21 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-                 {/* Page content */}
-         <main className="flex-1 p-6 overflow-y-auto bg-gray-50/50 dark:bg-gray-900/50">
-           {loading ? (
-             <div className="flex items-center justify-center h-full">
-               <div className="text-center">
-                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-                 <p className="text-gray-600 dark:text-gray-400">Loading dashboard data...</p>
-               </div>
-             </div>
-           ) : (
-             <div className="space-y-6">
-               {renderContent()}
-             </div>
-           )}
-         </main>
+        {/* Page content */}
+        <main className="flex-1 p-6 overflow-y-auto bg-gray-50/50 dark:bg-gray-900/50">
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+                <p className="text-gray-600 dark:text-gray-400">Loading dashboard data...</p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {renderContent()}
+            </div>
+          )}
+        </main>
       </div>
     </div>
   );

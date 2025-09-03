@@ -67,11 +67,27 @@ check_npm() {
     fi
 }
 
+# Check if git is installed
+check_git() {
+    print_status "Checking Git installation..."
+    if command -v git &> /dev/null; then
+        print_success "Git is installed"
+    else
+        print_warning "Git is not installed. Some features may not work properly."
+    fi
+}
+
 # Setup backend
 setup_backend() {
     print_status "Setting up backend..."
     
     cd bursary-backend
+    
+    # Check if requirements.txt exists
+    if [ ! -f "requirements.txt" ]; then
+        print_error "requirements.txt not found in bursary-backend directory"
+        exit 1
+    fi
     
     # Create virtual environment
     print_status "Creating virtual environment..."
@@ -89,6 +105,46 @@ setup_backend() {
     print_status "Initializing database..."
     $PYTHON_CMD init_database.py
     
+    # Create environment file from template
+    print_status "Creating environment configuration..."
+    if [ -f "environment.txt" ]; then
+        cp environment.txt .env
+        print_success "Environment file created from template"
+    else
+        print_warning "environment.txt template not found, creating basic .env"
+        cat > .env << EOF
+# Flask Configuration
+SECRET_KEY=your-super-secret-key-change-this-in-production
+FLASK_ENV=development
+FLASK_DEBUG=true
+
+# Database Configuration
+DATABASE_PATH=instance/bursary.db
+
+# JWT Configuration
+JWT_SECRET_KEY=dev-secret-key
+JWT_ACCESS_TOKEN_EXPIRES=3600
+
+# Email Configuration
+EMAIL_SERVER=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USERNAME=mainbursery@gmail.com
+EMAIL_PASSWORD=ltqi dinz mvcd aktl
+
+# Upload Configuration
+UPLOAD_FOLDER=uploads
+MAX_CONTENT_LENGTH=16777216
+ALLOWED_EXTENSIONS=png,jpg,jpeg,gif
+
+# Admin Configuration
+ADMIN_EMAIL=mainbursery@gmail.com
+ADMIN_PASSWORD=Admin123
+
+# CORS Configuration
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174,http://localhost:5175,http://127.0.0.1:5175
+EOF
+    fi
+    
     print_success "Backend setup completed!"
     cd ..
 }
@@ -103,6 +159,23 @@ setup_frontend() {
     print_status "Installing Node.js dependencies..."
     npm install
     
+    # Create frontend environment file from template
+    print_status "Creating frontend environment configuration..."
+    if [ -f "frontend-env.txt" ]; then
+        cp frontend-env.txt .env
+        print_success "Frontend environment file created from template"
+    else
+        print_warning "frontend-env.txt template not found, creating basic .env"
+        cat > .env << EOF
+VITE_API_BASE_URL=http://localhost:5001
+VITE_APP_NAME=BursaryHub
+VITE_DEV_MODE=true
+VITE_ENABLE_LOGGING=true
+VITE_ENABLE_DARK_MODE=true
+VITE_ENABLE_ANALYTICS=false
+EOF
+    fi
+    
     print_success "Frontend setup completed!"
     cd ..
 }
@@ -115,6 +188,7 @@ main() {
     check_python
     check_node
     check_npm
+    check_git
     
     # Setup backend
     setup_backend
@@ -129,19 +203,25 @@ main() {
     echo "1. Start the backend server:"
     echo "   cd bursary-backend"
     echo "   source venv/bin/activate"
-    echo "   python app.py"
+    echo "   python3 app.py"
     echo ""
     echo "2. In a new terminal, start the frontend:"
     echo "   cd frontend"
     echo "   npm run dev"
     echo ""
-    echo "3. Open http://localhost:5173 in your browser"
+    echo "3. Open the URL shown by npm run dev (usually http://localhost:5173 or http://localhost:5174)"
     echo ""
     echo "🔐 Default admin credentials:"
-    echo "   Email: admin@bursaryhub.com"
+    echo "   Email: mainbursery@gmail.com"
     echo "   Password: Admin123"
     echo ""
+    echo "⚠️  Important Notes:"
+    echo "   - Backend runs on http://localhost:5001"
+    echo "   - Frontend port may vary (5173, 5174, or 5175)"
+    echo "   - Check .env files in both directories if you encounter issues"
+    echo ""
     echo "📖 For detailed instructions, see SETUP_GUIDE.md"
+    echo "🐛 For troubleshooting, check the terminal output above"
 }
 
 # Run main function
