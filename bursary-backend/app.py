@@ -236,6 +236,112 @@ def send_application_status_email(application, status, admin_notes=None):
         print(f"❌ Error preparing application status email: {e}")
         return False
 
+def send_contact_status_email(contact_email, contact_name, subject, status):
+    """Send email notification for contact status update"""
+    try:
+        if status == 'resolved':
+            email_subject = "Your Contact Message Has Been Resolved"
+            message = f"""
+            <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <div style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                        <h1 style="margin: 0; font-size: 28px;">Contact Message Resolved</h1>
+                    </div>
+                    
+                    <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+                        <h2 style="color: #2c3e50; margin-top: 0;">Dear {contact_name},</h2>
+                        
+                        <p>We are pleased to inform you that your contact message regarding <strong>"{subject}"</strong> has been <strong>RESOLVED</strong>.</p>
+                        
+                        <div style="background: #eafaf1; border-left: 4px solid #27ae60; padding: 20px; margin: 20px 0; border-radius: 5px;">
+                            <h3 style="color: #27ae60; margin-top: 0;">Status Update:</h3>
+                            <p style="margin: 10px 0;"><strong>Status:</strong> <span style="color: #27ae60; font-weight: bold;">RESOLVED</span></p>
+                            <p style="margin: 10px 0;"><strong>Subject:</strong> {subject}</p>
+                        </div>
+                        
+                        <p>Thank you for contacting us. If you have any further questions or concerns, please don't hesitate to reach out to us again.</p>
+                        
+                        <div style="background: #ecf0f1; padding: 20px; margin: 20px 0; border-radius: 5px; text-align: center;">
+                            <p style="margin: 0; color: #7f8c8d;">
+                                <strong>Bursary Hub Team</strong><br>
+                                Email: mainbursery@gmail.com<br>
+                                We're here to help!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+        else:
+            return False
+        
+        return send_email(contact_email, email_subject, message)
+        
+    except Exception as e:
+        print(f"❌ Error preparing contact status email: {e}")
+        return False
+
+def send_report_status_email(report_email, report_name, report_title, status):
+    """Send email notification for report status update"""
+    try:
+        if status in ['reviewed', 'resolved']:
+            if status == 'reviewed':
+                email_subject = "Your Report Has Been Reviewed"
+                status_text = "REVIEWED"
+                status_color = "#f39c12"
+                bg_color = "#fef9e7"
+                border_color = "#f39c12"
+            else:  # resolved
+                email_subject = "Your Report Has Been Resolved"
+                status_text = "RESOLVED"
+                status_color = "#27ae60"
+                bg_color = "#eafaf1"
+                border_color = "#27ae60"
+            
+            message = f"""
+            <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <div style="background: linear-gradient(135deg, {status_color} 0%, {status_color}dd 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                        <h1 style="margin: 0; font-size: 28px;">Report Status Update</h1>
+                    </div>
+                    
+                    <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+                        <h2 style="color: #2c3e50; margin-top: 0;">Dear {report_name},</h2>
+                        
+                        <p>We are pleased to inform you that your report regarding <strong>"{report_title}"</strong> has been <strong>{status_text}</strong>.</p>
+                        
+                        <div style="background: {bg_color}; border-left: 4px solid {border_color}; padding: 20px; margin: 20px 0; border-radius: 5px;">
+                            <h3 style="color: {status_color}; margin-top: 0;">Status Update:</h3>
+                            <p style="margin: 10px 0;"><strong>Status:</strong> <span style="color: {status_color}; font-weight: bold;">{status_text}</span></p>
+                            <p style="margin: 10px 0;"><strong>Report Title:</strong> {report_title}</p>
+                        </div>
+                        
+                        <p>Thank you for bringing this matter to our attention. Your report helps us maintain the integrity of our bursary program.</p>
+                        
+                        <div style="background: #ecf0f1; padding: 20px; margin: 20px 0; border-radius: 5px; text-align: center;">
+                            <p style="margin: 0; color: #7f8c8d;">
+                                <strong>Bursary Hub Team</strong><br>
+                                Email: mainbursery@gmail.com<br>
+                                We're here to help!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+        else:
+            return False
+        
+        return send_email(report_email, email_subject, message)
+        
+    except Exception as e:
+        print(f"❌ Error preparing report status email: {e}")
+        return False
+
 # Helper function to get user from token
 def get_current_user():
     token = request.headers.get('Authorization')
@@ -502,17 +608,61 @@ def get_report(report_id):
 @app.route('/reports/<int:report_id>', methods=['PUT'])
 @admin_or_moderator_required()
 def update_report(report_id):
-    """Update report status (admin/moderator only)"""
+    """Update report (admin/moderator only)"""
     try:
         data = request.get_json()
-        new_status = data.get('status')
         
-        if new_status not in ['pending', 'reviewed', 'resolved']:
-            return jsonify({'error': 'Invalid status'}), 400
+        # Check if this is a status-only update (from dropdown)
+        if 'status' in data and len(data) == 1:
+            new_status = data.get('status')
+            if new_status not in ['pending', 'reviewed', 'resolved']:
+                return jsonify({'error': 'Invalid status'}), 400
+            
+            # Update report status only
+            Report.update_report_status(report_id, new_status)
+            
+            # Send email notification if status changed to reviewed or resolved
+            if new_status in ['reviewed', 'resolved']:
+                report = Report.get_report_by_id(report_id)
+                if report:
+                    try:
+                        # Convert SQLite Row to dictionary
+                        report_dict = dict(report)
+                        send_report_status_email(report_dict['reporter_email'], report_dict['reporter_name'], report_dict['title'], new_status)
+                    except Exception as email_error:
+                        print(f"Failed to send email notification: {email_error}")
+                        # Don't fail the request if email fails
+            
+            return jsonify({'message': 'Report status updated successfully'}), 200
         
-        Report.update_report_status(report_id, new_status)
-        return jsonify({'message': 'Report status updated successfully'}), 200
+        # Full report update (from modal)
+        else:
+            # Validate required fields
+            required_fields = ['title', 'description', 'report_type', 'county', 'sub_county', 'ward', 'village', 'status']
+            for field in required_fields:
+                if field not in data:
+                    return jsonify({'error': f'Missing required field: {field}'}), 400
+            
+            # Update all report fields
+            Report.update_report(report_id, data)
+            
+            # Send email notification if status changed to reviewed or resolved
+            new_status = data.get('status')
+            if new_status in ['reviewed', 'resolved']:
+                report = Report.get_report_by_id(report_id)
+                if report:
+                    try:
+                        # Convert SQLite Row to dictionary
+                        report_dict = dict(report)
+                        send_report_status_email(report_dict['reporter_email'], report_dict['reporter_name'], report_dict['title'], new_status)
+                    except Exception as email_error:
+                        print(f"Failed to send email notification: {email_error}")
+                        # Don't fail the request if email fails
+            
+            return jsonify({'message': 'Report updated successfully'}), 200
+        
     except Exception as e:
+        print(f"Error updating report: {e}")
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/reports/<int:report_id>', methods=['DELETE'])
@@ -689,6 +839,66 @@ def get_contact(contact_id):
         print(f"Error getting contact: {e}")
         return jsonify({'error': 'Failed to get contact message'}), 500
 
+
+@app.route('/contacts/<int:contact_id>', methods=['PUT'])
+@admin_required()
+def update_contact_status(contact_id):
+    """Update contact (admin only)"""
+    try:
+        data = request.get_json()
+        
+        # Check if this is a status-only update (from dropdown)
+        if 'status' in data and len(data) == 1:
+            new_status = data.get('status')
+            if new_status not in ['pending', 'resolved']:
+                return jsonify({'error': 'Invalid status. Must be pending or resolved'}), 400
+            
+            # Update contact status only
+            Contact.update_contact_status(contact_id, new_status)
+            
+            # Send email notification if status changed to resolved
+            if new_status == 'resolved':
+                contact = Contact.get_contact_by_id(contact_id)
+                if contact:
+                    try:
+                        # Convert SQLite Row to dictionary
+                        contact_dict = dict(contact)
+                        send_contact_status_email(contact_dict['email'], contact_dict['full_name'], contact_dict['subject'], new_status)
+                    except Exception as email_error:
+                        print(f"Failed to send email notification: {email_error}")
+                        # Don't fail the request if email fails
+            
+            return jsonify({'message': 'Contact status updated successfully'}), 200
+        
+        # Full contact update (from modal)
+        else:
+            # Validate required fields
+            required_fields = ['full_name', 'email', 'phone', 'subject', 'message', 'status']
+            for field in required_fields:
+                if field not in data:
+                    return jsonify({'error': f'Missing required field: {field}'}), 400
+            
+            # Update all contact fields
+            Contact.update_contact(contact_id, data)
+            
+            # Send email notification if status changed to resolved
+            new_status = data.get('status')
+            if new_status == 'resolved':
+                contact = Contact.get_contact_by_id(contact_id)
+                if contact:
+                    try:
+                        # Convert SQLite Row to dictionary
+                        contact_dict = dict(contact)
+                        send_contact_status_email(contact_dict['email'], contact_dict['full_name'], contact_dict['subject'], new_status)
+                    except Exception as email_error:
+                        print(f"Failed to send email notification: {email_error}")
+                        # Don't fail the request if email fails
+            
+            return jsonify({'message': 'Contact updated successfully'}), 200
+        
+    except Exception as e:
+        print(f"Error updating contact: {e}")
+        return jsonify({'error': 'Failed to update contact'}), 500
 
 @app.route('/contacts/<int:contact_id>', methods=['DELETE'])
 @admin_required()
