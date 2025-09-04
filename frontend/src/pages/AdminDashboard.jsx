@@ -517,9 +517,9 @@ const AdminDashboard = () => {
                     <td className="px-8 py-6 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
-                          <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                            <Shield className="w-6 h-6 text-white" />
-                          </div>
+                        <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                          <Shield className="w-6 h-6 text-white" />
+                        </div>
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-semibold text-gray-900 dark:text-white">{report.reporter_name}</div>
@@ -614,7 +614,7 @@ const AdminDashboard = () => {
                           </div>
                           <div className="text-xs text-gray-600 dark:text-gray-400">{application.email}</div>
                         </div>
-                      </div>
+                        </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
@@ -949,7 +949,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col lg:ml-72">
+      <div className="flex-1 flex flex-col lg:ml-0">
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg shadow-sm border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between h-16 px-6">
