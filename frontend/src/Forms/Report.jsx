@@ -14,7 +14,6 @@ const Report = () => {
         village: '',
         reportType: '',
         reason: '',
-        title: '',
         description: ''
     });
 
@@ -157,9 +156,9 @@ const Report = () => {
                             </label>
                             <input
                                 type="text"
-                                name="reason"
+                                name="title"
                                 required
-                                value={formData.reason}
+                                value={formData.title}
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white"
                                 placeholder="e.g. Suspected misuse of funds"

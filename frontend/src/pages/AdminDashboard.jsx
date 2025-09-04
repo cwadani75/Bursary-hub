@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
+import ReportUpdateModal from '../components/ReportUpdateModal';
+import ContactUpdateModal from '../components/ContactUpdateModal';
 import {
   Users,
   FileText,
@@ -49,6 +51,8 @@ const AdminDashboard = () => {
   const [applications, setApplications] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [expandedApplication, setExpandedApplication] = useState(null);
+  const [reportUpdateModal, setReportUpdateModal] = useState({ isOpen: false, report: null });
+  const [contactUpdateModal, setContactUpdateModal] = useState({ isOpen: false, contact: null });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -151,6 +155,13 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleUpdateReport = async (reportId) => {
+    const report = reports.find(r => r.id === reportId);
+    if (report) {
+      setReportUpdateModal({ isOpen: true, report });
+    }
+  };
+
   const handleDeleteReport = async (reportId) => {
     if (window.confirm('Are you sure you want to delete this report?')) {
       try {
@@ -179,6 +190,22 @@ const AdminDashboard = () => {
       } catch (error) {
         console.error('Error deleting application:', error);
       }
+    }
+  };
+
+  const handleUpdateContactStatus = async (contactId, newStatus) => {
+    try {
+      await apiService.updateContactStatus(contactId, newStatus);
+      await loadDashboardData(); // Reload data
+    } catch (error) {
+      console.error('Error updating contact status:', error);
+    }
+  };
+
+  const handleUpdateContact = async (contactId) => {
+    const contact = contacts.find(c => c.id === contactId);
+    if (contact) {
+      setContactUpdateModal({ isOpen: true, contact });
     }
   };
 
@@ -482,17 +509,18 @@ const AdminDashboard = () => {
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
               <tr>
-                <th className="px-8 py-6 text-left text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Report</th>
-                <th className="px-8 py-6 text-left text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Reporter</th>
-                <th className="px-8 py-6 text-left text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                <th className="px-8 py-6 text-left text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Date</th>
-                <th className="px-8 py-6 text-left text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Report Details</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Reporter Info</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Location</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="px-8 py-12 text-center">
+                  <td colSpan="6" className="px-6 py-12 text-center">
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
                       <span className="ml-3 text-gray-600 dark:text-gray-400">Loading reports...</span>
@@ -501,14 +529,14 @@ const AdminDashboard = () => {
                 </tr>
               ) : reports.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-8 py-12 text-center text-gray-500 dark:text-gray-400">
+                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                     No reports found
                   </td>
                 </tr>
               ) : (
                 reports.map((report) => (
                   <tr key={report.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300">
-                    <td className="px-8 py-6 whitespace-nowrap">
+                    <td className="px-6 py-4">
                       <div>
                         <div className="text-lg font-semibold text-gray-900 dark:text-white">{report.title}</div>
                         <div className="text-gray-600 dark:text-gray-400 max-w-xs truncate">{report.description}</div>
@@ -517,40 +545,48 @@ const AdminDashboard = () => {
                     <td className="px-8 py-6 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
-                        <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                          <Shield className="w-6 h-6 text-white" />
-                        </div>
+                          <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                            <Shield className="w-6 h-6 text-white" />
+                          </div>
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-semibold text-gray-900 dark:text-white">{report.reporter_name}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-6 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <select
                         value={report.status}
                         onChange={(e) => handleUpdateReportStatus(report.id, e.target.value)}
-                        className="text-sm border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                        className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
                       >
                         <option value="pending">Pending</option>
                         <option value="reviewed">Reviewed</option>
                         <option value="resolved">Resolved</option>
                       </select>
                     </td>
-                    <td className="px-8 py-6 whitespace-nowrap text-gray-600 dark:text-gray-400">
+                    <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">
                       {new Date(report.created_at).toLocaleDateString('en-US', {
                         year: 'numeric',
-                        month: 'long',
+                        month: 'short',
                         day: 'numeric'
                       })}
                     </td>
-                    <td className="px-8 py-6 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleDeleteReport(report.id)}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 px-4 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
-                      >
-                        Delete
-                      </button>
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-medium">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleUpdateReport(report.id)}
+                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
+                        >
+                          Update
+                        </button>
+                        <button
+                          onClick={() => handleDeleteReport(report.id)}
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -756,6 +792,7 @@ const AdminDashboard = () => {
                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Contact</th>
                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Subject</th>
                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Message</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Date</th>
                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Actions</th>
               </tr>
@@ -787,6 +824,16 @@ const AdminDashboard = () => {
                       {contact.message}
                     </div>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <select
+                      value={contact.status || 'pending'}
+                      onChange={(e) => handleUpdateContactStatus(contact.id, e.target.value)}
+                      className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="resolved">Resolved</option>
+                    </select>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">
                     {new Date(contact.created_at).toLocaleDateString('en-US', {
                       year: 'numeric',
@@ -795,12 +842,20 @@ const AdminDashboard = () => {
                     })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs font-medium">
-                    <button
-                      onClick={() => handleDeleteContact(contact.id)}
-                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
-                    >
-                      Delete
-                    </button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleUpdateContact(contact.id)}
+                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
+                      >
+                        Update
+                      </button>
+                      <button
+                        onClick={() => handleDeleteContact(contact.id)}
+                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -987,6 +1042,23 @@ const AdminDashboard = () => {
           )}
         </main>
       </div>
+
+      {/* Report Update Modal */}
+      <ReportUpdateModal
+        isOpen={reportUpdateModal.isOpen}
+        onClose={() => setReportUpdateModal({ isOpen: false, report: null })}
+        report={reportUpdateModal.report}
+        onUpdate={loadDashboardData}
+      />
+
+      {/* Contact Update Modal */}
+      <ContactUpdateModal
+        isOpen={contactUpdateModal.isOpen}
+        onClose={() => setContactUpdateModal({ isOpen: false, contact: null })}
+        contact={contactUpdateModal.contact}
+        onUpdate={loadDashboardData}
+      />
+
     </div>
   );
 };

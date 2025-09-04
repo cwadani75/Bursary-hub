@@ -91,12 +91,12 @@ class ApiService {
         method: 'POST',
         body: JSON.stringify(credentials),
       });
-      
+
       if (response.access_token) {
         this.setToken(response.access_token);
         this.setUser(response.user);
       }
-      
+
       return response;
     } catch (error) {
       console.error('Login error:', error);
@@ -241,6 +241,14 @@ class ApiService {
     return response;
   }
 
+  async updateContactStatus(contactId, status) {
+    const response = await this.request(`/contacts/${contactId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status })
+    });
+    return response;
+  }
+
   async deleteContact(contactId) {
     const response = await this.request(`/contacts/${contactId}`, {
       method: 'DELETE',
@@ -290,7 +298,7 @@ class ApiService {
       if (!token) {
         return false;
       }
-      
+
       const response = await this.request('/profile');
       return !!response;
     } catch (error) {

@@ -94,7 +94,7 @@ class Report:
         """Get report by ID"""
         conn = get_db_connection()
         report = conn.execute('''
-            SELECT r.*, u.name as reporter_name 
+            SELECT r.*, u.name as reporter_name, u.email as reporter_email 
             FROM reports r 
             JOIN users u ON r.reporter_id = u.id 
             WHERE r.id = ?
@@ -134,6 +134,22 @@ class Report:
         """Update report status (admin/moderator only)"""
         conn = get_db_connection()
         conn.execute('UPDATE reports SET status = ? WHERE id = ?', (new_status, report_id))
+        conn.commit()
+        conn.close()
+    
+    @staticmethod
+    def update_report(report_id, data):
+        """Update all report fields"""
+        conn = get_db_connection()
+        conn.execute('''
+            UPDATE reports 
+            SET title = ?, description = ?, report_type = ?, county = ?, sub_county = ?, ward = ?, village = ?, status = ?
+            WHERE id = ?
+        ''', (
+            data['title'], data['description'], data['report_type'], 
+            data['county'], data['sub_county'], data['ward'], data['village'], 
+            data['status'], report_id
+        ))
         conn.commit()
         conn.close()
     
@@ -263,6 +279,29 @@ class Contact:
         contacts = conn.execute('SELECT * FROM contacts ORDER BY created_at DESC').fetchall()
         conn.close()
         return contacts
+    
+    @staticmethod
+    def update_contact_status(contact_id, status):
+        """Update contact status (admin only)"""
+        conn = get_db_connection()
+        conn.execute('UPDATE contacts SET status = ? WHERE id = ?', (status, contact_id))
+        conn.commit()
+        conn.close()
+    
+    @staticmethod
+    def update_contact(contact_id, data):
+        """Update all contact fields"""
+        conn = get_db_connection()
+        conn.execute('''
+            UPDATE contacts 
+            SET full_name = ?, email = ?, phone = ?, subject = ?, message = ?, status = ?
+            WHERE id = ?
+        ''', (
+            data['full_name'], data['email'], data['phone'], 
+            data['subject'], data['message'], data['status'], contact_id
+        ))
+        conn.commit()
+        conn.close()
     
     @staticmethod
     def delete_contact(contact_id):
