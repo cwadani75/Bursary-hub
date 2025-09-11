@@ -56,7 +56,6 @@ const ContactUpdateModal = ({ isOpen, onClose, contact, onUpdate }) => {
 
     if (!isOpen) return null;
 
-
     return (
         <div className="fixed inset-0 z-[9999] overflow-y-auto" style={{ zIndex: 9999 }}>
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -66,8 +65,8 @@ const ContactUpdateModal = ({ isOpen, onClose, contact, onUpdate }) => {
 
                 <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full" style={{ position: 'relative', zIndex: 10000 }}>
-                    <div className="bg-white dark:bg-gray-800 px-6 pt-6 pb-4">
+                <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full w-full mx-4" style={{ position: 'relative', zIndex: 10000, maxWidth: '95vw' }}>
+                    <div className="bg-white dark:bg-gray-800 px-4 sm:px-6 pt-6 pb-4">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                                 Update Contact Message
@@ -111,7 +110,7 @@ const ContactUpdateModal = ({ isOpen, onClose, contact, onUpdate }) => {
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
                                     />
                                 </div>
                             </div>
@@ -170,18 +169,18 @@ const ContactUpdateModal = ({ isOpen, onClose, contact, onUpdate }) => {
                                 </select>
                             </div>
 
-                            <div className="flex justify-end space-x-3 pt-4">
+                            <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4">
                                 <button
                                     type="button"
                                     onClick={onClose}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors order-2 sm:order-1"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center order-1 sm:order-2"
                                 >
                                     {loading ? (
                                         <>

@@ -118,15 +118,7 @@ Frontend runs on:
 
 ## 👤 Default Admin Accounts
 
-* **Backend Demo Admin**
 
-  * Email: `mainbursery@gmail.com`
-  * Password: `Admin123`
-
-* **Frontend Setup Admin**
-
-  * Email: `admin@bursaryhub.com`
-  * Password: `Admin123`
 
 ---
 

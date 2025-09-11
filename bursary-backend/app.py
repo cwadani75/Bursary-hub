@@ -194,8 +194,8 @@ def send_application_status_email(application, status, admin_notes=None):
                         <h1 style="margin: 0; font-size: 28px;">Application Status Update</h1>
                     </div>
                     
-                    <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-                        <h2 style="color: #2c3e50; margin-top: 0;">Dear {applicant_name},</h2>
+                    <div style="background: 'f9f9f9'; padding: 30px; border-radius: 0 0 10px 10px;">
+                        <h2 style="color: '2c3e50'; margin-top: 0;">Dear {applicant_name},</h2>
                         
                         <p>We regret to inform you that your bursary application has been <strong>REJECTED</strong>.</p>
                         
@@ -302,7 +302,7 @@ def send_report_status_email(report_email, report_name, report_title, status):
             
             message = f"""
             <html>
-            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: '333';">
                 <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                     <div style="background: linear-gradient(135deg, {status_color} 0%, {status_color}dd 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
                         <h1 style="margin: 0; font-size: 28px;">Report Status Update</h1>
@@ -410,7 +410,7 @@ def forgot_password():
         <html>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, '764ba2' 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
                     <h1 style="margin: 0; font-size: 28px;">🔐 Password Reset</h1>
                     <p style="margin: 10px 0 0 0; font-size: 18px;">BursaryHub Account</p>
                 </div>
@@ -440,9 +440,9 @@ def forgot_password():
                     </div>
                 </div>
             </div>
-        </body>
-        </html>
-        """
+            </body>
+            </html>
+            """
         
         email_sent = send_email(user['email'], subject, message)
         
@@ -769,7 +769,7 @@ def update_application_status(application_id):
             else:
                 print(f"❌ Failed to send email notification for application {application_id}")
         else:
-            print(f"⚠️ Application {application_id} not found for email notification")
+            print(f"⚠ Application {application_id} not found for email notification")
         
         return jsonify({'message': 'Application status updated successfully'}), 200
     except Exception as e:
@@ -787,6 +787,8 @@ def delete_application(application_id):
         print(f"Error deleting application: {e}")
         return jsonify({'error': 'Failed to delete application'}), 500
 
+
+# ... (keep all the imports and setup code the same until the contact routes)
 
 # Contact endpoints
 @app.route('/contacts', methods=['POST'])
@@ -840,65 +842,89 @@ def get_contact(contact_id):
         return jsonify({'error': 'Failed to get contact message'}), 500
 
 
-@app.route('/contacts/<int:contact_id>', methods=['PUT'])
+@app.route('/contacts/<int:contact_id>/status', methods=['PUT'])
 @admin_required()
 def update_contact_status(contact_id):
-    """Update contact (admin only)"""
+    """Update contact status only (admin only)"""
     try:
         data = request.get_json()
         
-        # Check if this is a status-only update (from dropdown)
-        if 'status' in data and len(data) == 1:
-            new_status = data.get('status')
-            if new_status not in ['pending', 'resolved']:
-                return jsonify({'error': 'Invalid status. Must be pending or resolved'}), 400
+        if 'status' not in data:
+            return jsonify({'error': 'Status is required'}), 400
             
-            # Update contact status only
-            Contact.update_contact_status(contact_id, new_status)
-            
-            # Send email notification if status changed to resolved
-            if new_status == 'resolved':
-                contact = Contact.get_contact_by_id(contact_id)
-                if contact:
-                    try:
-                        # Convert SQLite Row to dictionary
-                        contact_dict = dict(contact)
-                        send_contact_status_email(contact_dict['email'], contact_dict['full_name'], contact_dict['subject'], new_status)
-                    except Exception as email_error:
-                        print(f"Failed to send email notification: {email_error}")
-                        # Don't fail the request if email fails
-            
-            return jsonify({'message': 'Contact status updated successfully'}), 200
+        new_status = data.get('status')
+        if new_status not in ['pending', 'resolved']:
+            return jsonify({'error': 'Invalid status. Must be pending or resolved'}), 400
         
-        # Full contact update (from modal)
-        else:
-            # Validate required fields
-            required_fields = ['full_name', 'email', 'phone', 'subject', 'message', 'status']
-            for field in required_fields:
-                if field not in data:
-                    return jsonify({'error': f'Missing required field: {field}'}), 400
-            
-            # Update all contact fields
-            Contact.update_contact(contact_id, data)
-            
-            # Send email notification if status changed to resolved
-            new_status = data.get('status')
-            if new_status == 'resolved':
-                contact = Contact.get_contact_by_id(contact_id)
-                if contact:
-                    try:
-                        # Convert SQLite Row to dictionary
-                        contact_dict = dict(contact)
-                        send_contact_status_email(contact_dict['email'], contact_dict['full_name'], contact_dict['subject'], new_status)
-                    except Exception as email_error:
-                        print(f"Failed to send email notification: {email_error}")
-                        # Don't fail the request if email fails
-            
-            return jsonify({'message': 'Contact updated successfully'}), 200
+        # Update contact status
+        Contact.update_contact_status(contact_id, new_status)
+        
+        # Send email notification if status changed to resolved
+        if new_status == 'resolved':
+            contact = Contact.get_contact_by_id(contact_id)
+            if contact:
+                try:
+                    contact_dict = dict(contact)
+                    send_contact_status_email(
+                        contact_dict['email'], 
+                        contact_dict['full_name'], 
+                        contact_dict['subject'], 
+                        new_status
+                    )
+                    print(f"✅ Email notification sent for contact {contact_id}")
+                except Exception as email_error:
+                    print(f"❌ Failed to send email notification: {email_error}")
+        
+        return jsonify({'message': 'Contact status updated successfully'}), 200
+        
+    except Exception as e:
+        print(f"Error updating contact status: {e}")
+        return jsonify({'error': 'Failed to update contact status'}), 500
+
+
+@app.route('/contacts/<int:contact_id>', methods=['PUT'])
+@admin_required()
+def update_contact(contact_id):
+    """Update all contact fields (admin only)"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['full_name', 'email', 'phone', 'subject', 'message', 'status']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        # Get current contact to check if status is changing
+        current_contact = Contact.get_contact_by_id(contact_id)
+        current_status = current_contact['status'] if current_contact else 'pending'
+        new_status = data.get('status')
+        
+        # Update all contact fields
+        Contact.update_contact(contact_id, data)
+        
+        # Send email notification if status changed to resolved
+        if current_status != 'resolved' and new_status == 'resolved':
+            contact = Contact.get_contact_by_id(contact_id)
+            if contact:
+                try:
+                    contact_dict = dict(contact)
+                    send_contact_status_email(
+                        contact_dict['email'], 
+                        contact_dict['full_name'], 
+                        contact_dict['subject'], 
+                        new_status
+                    )
+                    print(f"✅ Email notification sent for contact {contact_id}")
+                except Exception as email_error:
+                    print(f"❌ Failed to send email notification: {email_error}")
+        
+        return jsonify({'message': 'Contact updated successfully'}), 200
         
     except Exception as e:
         print(f"Error updating contact: {e}")
         return jsonify({'error': 'Failed to update contact'}), 500
+
 
 @app.route('/contacts/<int:contact_id>', methods=['DELETE'])
 @admin_required()
@@ -910,6 +936,7 @@ def delete_contact(contact_id):
         print(f"Error deleting contact: {e}")
         return jsonify({'error': 'Failed to delete contact message'}), 500
 
+# ... (keep the rest of the file the same)
 # Profile picture upload
 @app.route('/upload-profile-picture', methods=['POST'])
 @user_required()
@@ -969,8 +996,5 @@ if __name__ == '__main__':
     init_db()
     seed_admin_user()
     
-    print("🚀 Bursary Reporting System Backend Started!")
-    print("📧 Default Admin: mainbursery@gmail.com / Admin123")
-    print("🌐 API running on: http://localhost:5001")
-    
+
     app.run(debug=True, host='0.0.0.0', port=5001)

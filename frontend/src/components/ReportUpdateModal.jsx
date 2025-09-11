@@ -70,8 +70,8 @@ const ReportUpdateModal = ({ isOpen, onClose, report, onUpdate }) => {
 
                 <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full" style={{ position: 'relative', zIndex: 10000 }}>
-                    <div className="bg-white dark:bg-gray-800 px-6 pt-6 pb-4">
+                <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full mx-4" style={{ position: 'relative', zIndex: 10000, maxWidth: '95vw' }}>
+                    <div className="bg-white dark:bg-gray-800 px-4 sm:px-6 pt-6 pb-4">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                                 Update Report
@@ -79,6 +79,7 @@ const ReportUpdateModal = ({ isOpen, onClose, report, onUpdate }) => {
                             <button
                                 onClick={onClose}
                                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                aria-label="Close modal"
                             >
                                 <X className="w-6 h-6" />
                             </button>
@@ -86,7 +87,7 @@ const ReportUpdateModal = ({ isOpen, onClose, report, onUpdate }) => {
 
                         {error && (
                             <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center">
-                                <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
+                                <AlertCircle className="w-5 h-5 text-red-500 mr-2 flex-shrink-0" />
                                 <span className="text-red-700 dark:text-red-300">{error}</span>
                             </div>
                         )}
@@ -205,18 +206,18 @@ const ReportUpdateModal = ({ isOpen, onClose, report, onUpdate }) => {
                                 </select>
                             </div>
 
-                            <div className="flex justify-end space-x-3 pt-4">
+                            <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4">
                                 <button
                                     type="button"
                                     onClick={onClose}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors order-2 sm:order-1"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center order-1 sm:order-2"
                                 >
                                     {loading ? (
                                         <>

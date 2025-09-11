@@ -64,7 +64,7 @@ def init_db():
             village TEXT NOT NULL,
             institution TEXT NOT NULL,
             course TEXT NOT NULL,
-            year_of_study TEXT NOT NULL,
+            year_of study TEXT NOT NULL,
             fee_amount REAL NOT NULL,
             family_income REAL NOT NULL,
             reason TEXT NOT NULL,
@@ -76,7 +76,7 @@ def init_db():
         )
     ''')
     
-    # Create contacts table
+    # Create contacts table - FIXED: Added status column
     conn.execute('''
         CREATE TABLE IF NOT EXISTS contacts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,6 +85,7 @@ def init_db():
             phone TEXT NOT NULL,
             subject TEXT NOT NULL,
             message TEXT NOT NULL,
+            status TEXT DEFAULT 'new', -- Added the missing status column
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -105,6 +106,27 @@ def init_db():
     conn.close()
     print("✅ Database initialized successfully!")
 
+def update_existing_database():
+    """Update existing database schema to add missing columns"""
+    conn = get_db_connection()
+    
+    # Check if status column exists in contacts table and add it if missing
+    try:
+        conn.execute("SELECT status FROM contacts LIMIT 1")
+        print("✅ Status column already exists in contacts table")
+    except sqlite3.OperationalError:
+        try:
+            conn.execute('ALTER TABLE contacts ADD COLUMN status TEXT DEFAULT "new"')
+            print("✅ Added status column to contacts table")
+        except sqlite3.OperationalError as e:
+            print(f"⚠️ Could not add status column: {e}")
+    
+    # Check if other potentially missing columns exist and add them
+    # Add any other missing columns that might be causing issues
+    
+    conn.commit()
+    conn.close()
+
 def seed_admin_user():
     """Create default admin user"""
     conn = get_db_connection()
@@ -124,3 +146,31 @@ def seed_admin_user():
         print("ℹ️ Admin user already exists")
     
     conn.close()
+
+def recreate_database():
+    """Completely recreate the database (use with caution - will delete all data!)"""
+    if os.path.exists(Config.DATABASE_PATH):
+        os.remove(Config.DATABASE_PATH)
+        print("🗑️ Old database removed")
+    
+    init_db()
+    print("✅ New database created with correct schema")
+
+if __name__ == "__main__":
+    print("Choose an option:")
+    print("1. Update existing database (keep data)")
+    print("2. Recreate database (delete all data)")
+    
+    choice = input("Enter your choice (1 or 2): ")
+    
+    if choice == "2":
+        recreate_database()
+    else:
+        # First try to update the existing database
+        update_existing_database()
+        
+        # Then initialize to make sure all tables exist
+        init_db()
+    
+    # Seed admin user
+    seed_admin_user()
