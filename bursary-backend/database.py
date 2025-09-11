@@ -40,6 +40,9 @@ def init_db():
             sub_county TEXT,
             ward TEXT,
             village TEXT,
+            reporter_full_name TEXT,
+            reporter_email TEXT,
+            reporter_phone TEXT,
             status TEXT DEFAULT 'pending',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (reporter_id) REFERENCES users (id)
@@ -76,7 +79,7 @@ def init_db():
         )
     ''')
     
-    # Create contacts table - FIXED: Added status column
+    # Create contacts table - FIXED: Added status column and updated_at column
     conn.execute('''
         CREATE TABLE IF NOT EXISTS contacts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,8 +88,9 @@ def init_db():
             phone TEXT NOT NULL,
             subject TEXT NOT NULL,
             message TEXT NOT NULL,
-            status TEXT DEFAULT 'new', -- Added the missing status column
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            status TEXT DEFAULT 'pending', -- Added the missing status column
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     
@@ -116,10 +120,33 @@ def update_existing_database():
         print("✅ Status column already exists in contacts table")
     except sqlite3.OperationalError:
         try:
-            conn.execute('ALTER TABLE contacts ADD COLUMN status TEXT DEFAULT "new"')
+            conn.execute('ALTER TABLE contacts ADD COLUMN status TEXT DEFAULT "pending"')
             print("✅ Added status column to contacts table")
         except sqlite3.OperationalError as e:
             print(f"⚠️ Could not add status column: {e}")
+    
+    # Check if updated_at column exists in contacts table and add it if missing
+    try:
+        conn.execute("SELECT updated_at FROM contacts LIMIT 1")
+        print("✅ Updated_at column already exists in contacts table")
+    except sqlite3.OperationalError:
+        try:
+            conn.execute('ALTER TABLE contacts ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
+            print("✅ Added updated_at column to contacts table")
+        except sqlite3.OperationalError as e:
+            print(f"⚠️ Could not add updated_at column: {e}")
+    
+    # Check if reporter contact columns exist in reports table and add them if missing
+    for column_name in ['reporter_full_name', 'reporter_email', 'reporter_phone']:
+        try:
+            conn.execute(f"SELECT {column_name} FROM reports LIMIT 1")
+            print(f"✅ {column_name} column already exists in reports table")
+        except sqlite3.OperationalError:
+            try:
+                conn.execute(f'ALTER TABLE reports ADD COLUMN {column_name} TEXT')
+                print(f"✅ Added {column_name} column to reports table")
+            except sqlite3.OperationalError as e:
+                print(f"⚠️ Could not add {column_name} column: {e}")
     
     # Check if other potentially missing columns exist and add them
     # Add any other missing columns that might be causing issues

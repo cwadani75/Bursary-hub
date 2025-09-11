@@ -549,9 +549,16 @@ def create_report():
             'village': data.get('village')
         }
         
+        # Extract contact data
+        contact_data = {
+            'fullName': data.get('fullName'),
+            'email': data.get('email'),
+            'phone': data.get('phone')
+        }
+        
         user_data = get_current_user()
         user_id = user_data['user_id']
-        report_id = Report.create_report(user_id, title, description, data['reportType'], location_data)
+        report_id = Report.create_report(user_id, title, description, data['reportType'], location_data, contact_data)
         
         return jsonify({
             'message': 'Report created successfully',

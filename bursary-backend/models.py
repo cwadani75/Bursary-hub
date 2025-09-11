@@ -70,17 +70,21 @@ class User:
 
 class Report:
     @staticmethod
-    def create_report(user_id, title, description, report_type, location_data):
+    def create_report(user_id, title, description, report_type, location_data, contact_data=None):
         conn = get_db_connection()
         try:
             cursor = conn.cursor()
             cursor.execute(
                 '''INSERT INTO reports 
-                (reporter_id, title, description, report_type, county, sub_county, ward, village) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+                (reporter_id, title, description, report_type, county, sub_county, ward, village, 
+                 reporter_full_name, reporter_email, reporter_phone) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                 (user_id, title, description, report_type, 
                  location_data.get('county'), location_data.get('subCounty'),
-                 location_data.get('ward'), location_data.get('village'))
+                 location_data.get('ward'), location_data.get('village'),
+                 contact_data.get('fullName') if contact_data else None,
+                 contact_data.get('email') if contact_data else None,
+                 contact_data.get('phone') if contact_data else None)
             )
             report_id = cursor.lastrowid
             conn.commit()
@@ -95,7 +99,10 @@ class Report:
     def get_all_reports():
         conn = get_db_connection()
         reports = conn.execute('''
-            SELECT r.*, u.name as reporter_name, u.email as reporter_email 
+            SELECT r.*, u.name as reporter_name, u.email as reporter_email,
+                   COALESCE(r.reporter_full_name, u.name) as display_name,
+                   COALESCE(r.reporter_email, u.email) as display_email,
+                   r.reporter_phone as phone
             FROM reports r 
             JOIN users u ON r.reporter_id = u.id 
             ORDER BY r.created_at DESC

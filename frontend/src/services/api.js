@@ -242,9 +242,17 @@ class ApiService {
   }
 
   async updateContactStatus(contactId, status) {
-    const response = await this.request(`/contacts/${contactId}`, {
+    const response = await this.request(`/contacts/${contactId}/status`, {
       method: 'PUT',
       body: JSON.stringify({ status })
+    });
+    return response;
+  }
+
+  async updateContact(contactId, contactData) {
+    const response = await this.request(`/contacts/${contactId}`, {
+      method: 'PUT',
+      body: JSON.stringify(contactData)
     });
     return response;
   }

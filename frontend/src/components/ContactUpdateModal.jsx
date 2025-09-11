@@ -42,7 +42,7 @@ const ContactUpdateModal = ({ isOpen, onClose, contact, onUpdate }) => {
 
         try {
             // Update all contact fields
-            await apiService.updateContactStatus(contact.id, formData);
+            await apiService.updateContact(contact.id, formData);
 
             onUpdate();
             onClose();
