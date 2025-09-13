@@ -90,23 +90,11 @@ function App() {
 
           <main className="min-h-screen">
             <Routes>
-              {/* Public routes - redirect to login if not authenticated */}
-              <Route
-                path="/"
-                element={
-                  isAuthenticated ?
-                    <Home /> :
-                    <Navigate to="/login" replace />
-                }
-              />
-              <Route
-                path="/about"
-                element={
-                  isAuthenticated ?
-                    <About /> :
-                    <Navigate to="/login" replace />
-                }
-              />
+              {/* Public routes - always accessible */}
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+
+              {/* Protected routes - require authentication */}
               <Route
                 path="/contact"
                 element={
@@ -177,7 +165,7 @@ function App() {
               />
 
               {/* Catch all route */}
-              <Route path="*" element={<Navigate to="/login" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
 
