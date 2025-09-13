@@ -503,7 +503,6 @@ const AdminDashboard = () => {
                 <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Reporter</th>
                 <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Title</th>
                 <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Type</th>
-                <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Location</th>
                 <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Status</th>
                 <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Date</th>
                 <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Actions</th>
@@ -512,7 +511,7 @@ const AdminDashboard = () => {
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-12 text-center">
+                  <td colSpan="6" className="px-6 py-12 text-center">
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
                     </div>
@@ -520,7 +519,7 @@ const AdminDashboard = () => {
                 </tr>
               ) : reports.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                     No reports found
                   </td>
                 </tr>
@@ -550,13 +549,6 @@ const AdminDashboard = () => {
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                           {report.report_type}
                         </span>
-                      </td>
-                      <td className="px-4 md:px-6 py-4">
-                        <div className="text-xs text-gray-600 dark:text-gray-400">
-                          <div className="font-medium">{report.county || 'N/A'}</div>
-                          <div>{report.sub_county || 'N/A'}</div>
-                          <div>{report.ward || 'N/A'}</div>
-                        </div>
                       </td>
                       <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                         <select
@@ -601,7 +593,7 @@ const AdminDashboard = () => {
                     </tr>
                     {expandedReport === report.id && (
                       <tr>
-                        <td colSpan="7" className="px-4 md:px-6 py-4 bg-gray-50 dark:bg-gray-700">
+                        <td colSpan="6" className="px-4 md:px-6 py-4 bg-gray-50 dark:bg-gray-700">
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                             <div className="space-y-3">
                               <h4 className="font-semibold text-gray-900 dark:text-white text-sm border-b border-gray-200 dark:border-gray-600 pb-2">
@@ -866,7 +858,7 @@ const AdminDashboard = () => {
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
               <tr>
                 <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Contact</th>
-                <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:gray-300 uppercase tracking-wider">Subject</th>
+                <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Subject</th>
                 <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Message</th>
                 <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Status</th>
                 <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Date</th>

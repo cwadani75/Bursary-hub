@@ -107,7 +107,7 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-indigo-300 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-200">Dadaab, Garissa County, Kenya</span>
+                <span className="text-gray-200">Kenya, Garissa County, Dadab</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-indigo-300 flex-shrink-0" />
@@ -115,7 +115,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-indigo-300 flex-shrink-0" />
-                <span className="text-gray-200">+254 712 345 678</span>
+                <span className="text-gray-200">+254 757 42 4125</span>
               </div>
             </div>
           </div>
