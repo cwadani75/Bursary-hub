@@ -38,6 +38,39 @@ import {
 } from 'lucide-react';
 
 const AdminDashboard = () => {
+  // Add custom scrollbar styles
+  React.useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .scrollable-table::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+      .scrollable-table::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+      }
+      .scrollable-table::-webkit-scrollbar-thumb {
+        background: #94a3b8;
+        border-radius: 4px;
+      }
+      .scrollable-table::-webkit-scrollbar-thumb:hover {
+        background: #64748b;
+      }
+      .dark .scrollable-table::-webkit-scrollbar-track {
+        background: #1e293b;
+      }
+      .dark .scrollable-table::-webkit-scrollbar-thumb {
+        background: #475569;
+      }
+      .dark .scrollable-table::-webkit-scrollbar-thumb:hover {
+        background: #64748b;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
+
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -228,6 +261,36 @@ const AdminDashboard = () => {
       } catch (error) {
         console.error('Error deleting application:', error);
       }
+    }
+  };
+
+  const handleDownloadFile = async (filename) => {
+    try {
+      const token = apiService.getToken();
+      const url = `http://localhost:5001/uploads/applications/${filename}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download file');
+      }
+
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      alert('Failed to download file');
     }
   };
 
@@ -690,149 +753,206 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
-              <tr>
-                <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Applicant</th>
-                <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Institution</th>
-                <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Fee Amount</th>
-                <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Date</th>
-                <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {applications.map((application) => (
-                <React.Fragment key={application.id}>
-                  <tr className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 group">
-                    <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-8 w-8 md:h-10 md:w-10">
-                          <div className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                            <Shield className="w-4 h-4 md:w-5 md:h-5 text-white" />
+      {/* Applications Grid - New Design */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {applications.map((application) => (
+          <div key={application.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 min-h-[400px] flex flex-col">
+            {/* Card Header */}
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 p-4 border-b border-gray-100 dark:border-gray-700">
+              <div className="flex flex-col space-y-3">
+                <div className="flex items-center space-x-3">
+                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md flex-shrink-0">
+                    <Shield className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-base truncate">
+                      {application.first_name} {application.last_name}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{application.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-medium text-gray-900 dark:text-white">
+                    KES {application.fee_amount?.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    {new Date(application.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card Body */}
+            <div className="p-4 space-y-4 flex-1">
+              {/* Institution Info */}
+              <div className="flex items-start space-x-2">
+                <GraduationCap className="w-4 h-4 text-indigo-600 dark:text-indigo-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-gray-900 dark:text-white text-sm break-words">{application.institution}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 break-words">{application.course}</div>
+                </div>
+              </div>
+
+              {/* Location Info */}
+              <div className="flex items-start space-x-2">
+                <MapPin className="w-4 h-4 text-indigo-600 dark:text-indigo-400 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-gray-600 dark:text-gray-400 break-words flex-1 min-w-0">
+                  {application.county}, {application.sub_county}
+                </div>
+              </div>
+
+              {/* Attachments Status */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Documents</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {[
+                      'fee_structure_pdf', 'student_id_pdf', 'student_national_id_pdf',
+                      'parent_id_mother_pdf', 'parent_id_father_pdf', 'result_slip_pdf'
+                    ].filter(docKey => application[docKey]).length}/6 uploaded
+                  </span>
+                </div>
+                <div className="flex space-x-1">
+                  {[
+                    'fee_structure_pdf', 'student_id_pdf', 'student_national_id_pdf',
+                    'parent_id_mother_pdf', 'parent_id_father_pdf', 'result_slip_pdf'
+                  ].map((docKey) => (
+                    <div key={docKey} className="w-3 h-3 rounded-full border-2 border-gray-200 dark:border-gray-600">
+                      {application[docKey] ? (
+                        <div className="w-full h-full bg-green-500 rounded-full"></div>
+                      ) : (
+                        <div className="w-full h-full bg-red-500 rounded-full"></div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Status */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Status</span>
+                <select
+                  value={application.status}
+                  onChange={(e) => handleUpdateApplicationStatus(application.id, e.target.value)}
+                  className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Card Footer */}
+            <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex items-center justify-between mt-auto">
+              <button
+                onClick={() => setExpandedApplication(expandedApplication === application.id ? null : application.id)}
+                className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors"
+              >
+                {expandedApplication === application.id ? 'Hide Details' : 'View Details'}
+              </button>
+              <button
+                onClick={() => handleDeleteApplication(application.id)}
+                className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+
+            {/* Expanded Details */}
+            {expandedApplication === application.id && (
+              <div className="border-t border-gray-100 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-700">
+                <div className="space-y-4">
+                  {/* Personal Details */}
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-2">Personal Details</h4>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div><span className="font-medium text-gray-600 dark:text-gray-400">Phone:</span> {application.phone}</div>
+                      <div><span className="font-medium text-gray-600 dark:text-gray-400">ID:</span> {application.id_number}</div>
+                      <div><span className="font-medium text-gray-600 dark:text-gray-400">Gender:</span> {application.gender}</div>
+                      <div><span className="font-medium text-gray-600 dark:text-gray-400">DOB:</span> {application.dob}</div>
+                    </div>
+                  </div>
+
+                  {/* Location Details */}
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-2">Location</h4>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div><span className="font-medium text-gray-600 dark:text-gray-400">Ward:</span> {application.ward}</div>
+                      <div><span className="font-medium text-gray-600 dark:text-gray-400">Village:</span> {application.village}</div>
+                    </div>
+                  </div>
+
+                  {/* Education Details */}
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-2">Education</h4>
+                    <div className="text-xs">
+                      <div><span className="font-medium text-gray-600 dark:text-gray-400">Year of Study:</span> {application.year_of_study}</div>
+                    </div>
+                  </div>
+
+                  {/* Financial Details */}
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-2">Financial Information</h4>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div><span className="font-medium text-gray-600 dark:text-gray-400">Family Income:</span> KES {application.family_income?.toLocaleString()}</div>
+                    </div>
+                    <div className="mt-2">
+                      <span className="font-medium text-gray-600 dark:text-gray-400 text-xs">Reason:</span>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{application.reason}</p>
+                    </div>
+                  </div>
+
+                  {/* Documents */}
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-2">Required Documents</h4>
+                    <div className="space-y-2">
+                      {[
+                        { key: 'fee_structure_pdf', label: 'Fee Structure' },
+                        { key: 'student_id_pdf', label: 'Student ID' },
+                        { key: 'student_national_id_pdf', label: 'Student National ID' },
+                        { key: 'parent_id_mother_pdf', label: 'Parent ID (Mother)' },
+                        { key: 'parent_id_father_pdf', label: 'Parent ID (Father)' },
+                        { key: 'result_slip_pdf', label: 'Result Slip' }
+                      ].map((doc) => (
+                        <div key={doc.key} className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded-lg">
+                          <div className="flex items-center space-x-2">
+                            <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{doc.label}</span>
                           </div>
+                          {application[doc.key] ? (
+                            <div className="flex items-center space-x-1">
+                              <button
+                                onClick={() => handleDownloadFile(application[doc.key])}
+                                className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
+                                title="Download"
+                              >
+                                <Download className="w-4 h-4" />
+                              </button>
+                              <span className="text-xs text-green-600 dark:text-green-400">✓</span>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-red-600 dark:text-red-400">✗</span>
+                          )}
                         </div>
-                        <div className="ml-3 md:ml-4">
-                          <div className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                            {application.first_name} {application.last_name}
-                          </div>
-                          <div className="text-xs text-gray-600 dark:text-gray-400">{application.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-semibold text-gray-900 dark:text-white">{application.institution}</div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">{application.course}</div>
-                      </div>
-                    </td>
-                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      KES {application.fee_amount?.toLocaleString()}
-                    </td>
-                    <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                      <select
-                        value={application.status}
-                        onChange={(e) => handleUpdateApplicationStatus(application.id, e.target.value)}
-                        className="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 md:px-3 md:py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                      </select>
-                    </td>
-                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">
-                      {new Date(application.created_at).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </td>
-                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-xs font-medium">
-                      <div className="flex flex-wrap gap-1 md:gap-2">
-                        <button
-                          onClick={() => setExpandedApplication(expandedApplication === application.id ? null : application.id)}
-                          className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 px-2 py-1 rounded hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all duration-300"
-                        >
-                          {expandedApplication === application.id ? 'Hide' : 'View'} Details
-                        </button>
-                        <button
-                          onClick={() => handleDeleteApplication(application.id)}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  {/* Expanded Application Details */}
-                  {expandedApplication === application.id && (
-                    <tr>
-                      <td colSpan="6" className="px-4 md:px-6 py-4 bg-gray-50 dark:bg-gray-700">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                          {/* Personal Details */}
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-gray-900 dark:text-white text-sm border-b border-gray-200 dark:border-gray-600 pb-2">
-                              Personal Details
-                            </h4>
-                            <div className="space-y-2 text-xs">
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Full Name:</span> {application.first_name} {application.last_name}</div>
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Email:</span> {application.email}</div>
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Phone:</span> {application.phone}</div>
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">ID Number:</span> {application.id_number}</div>
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Gender:</span> {application.gender}</div>
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Date of Birth:</span> {application.dob}</div>
-                            </div>
-                          </div>
-
-                          {/* Location Details */}
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-gray-900 dark:text-white text-sm border-b border-gray-200 dark:border-gray-600 pb-2">
-                              Location
-                            </h4>
-                            <div className="space-y-2 text-xs">
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">County:</span> {application.county}</div>
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Sub-County:</span> {application.sub_county}</div>
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Ward:</span> {application.ward}</div>
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Village:</span> {application.village}</div>
-                            </div>
-                          </div>
-
-                          {/* Education Details */}
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-gray-900 dark:text-white text-sm border-b border-gray-200 dark:border-gray-600 pb-2">
-                              Education
-                            </h4>
-                            <div className="space-y-2 text-xs">
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Institution:</span> {application.institution}</div>
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Course:</span> {application.course}</div>
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Year of Study:</span> {application.year_of_study}</div>
-                            </div>
-                          </div>
-
-                          {/* Financial Details */}
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-gray-900 dark:text-white text-sm border-b border-gray-200 dark:border-gray-600 pb-2">
-                              Financial Information
-                            </h4>
-                            <div className="space-y-2 text-xs">
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Fee Amount:</span> KES {application.fee_amount?.toLocaleString()}</div>
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Family Income:</span> KES {application.family_income?.toLocaleString()}</div>
-                              <div><span className="font-medium text-gray-600 dark:text-gray-400">Reason:</span> {application.reason}</div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
+
+      {/* Empty State */}
+      {applications.length === 0 && (
+        <div className="text-center py-12">
+          <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Applications Found</h3>
+          <p className="text-gray-600 dark:text-gray-400">No bursary applications have been submitted yet.</p>
+        </div>
+      )}
     </div>
   );
 

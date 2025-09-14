@@ -67,12 +67,18 @@ def init_db():
             village TEXT NOT NULL,
             institution TEXT NOT NULL,
             course TEXT NOT NULL,
-            year_of study TEXT NOT NULL,
+            year_of_study TEXT NOT NULL,
             fee_amount REAL NOT NULL,
             family_income REAL NOT NULL,
             reason TEXT NOT NULL,
             status TEXT DEFAULT 'pending',
             admin_notes TEXT,
+            fee_structure_pdf TEXT,
+            student_id_pdf TEXT,
+            student_national_id_pdf TEXT,
+            parent_id_mother_pdf TEXT,
+            parent_id_father_pdf TEXT,
+            result_slip_pdf TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id)
@@ -148,8 +154,33 @@ def update_existing_database():
             except sqlite3.OperationalError as e:
                 print(f"⚠️ Could not add {column_name} column: {e}")
     
-    # Check if other potentially missing columns exist and add them
-    # Add any other missing columns that might be causing issues
+    # Check if attachment columns exist in applications table and add them if missing
+    attachment_columns = [
+        'fee_structure_pdf', 'student_id_pdf', 'student_national_id_pdf',
+        'parent_id_mother_pdf', 'parent_id_father_pdf', 'result_slip_pdf'
+    ]
+    
+    for column_name in attachment_columns:
+        try:
+            conn.execute(f"SELECT {column_name} FROM applications LIMIT 1")
+            print(f"✅ {column_name} column already exists in applications table")
+        except sqlite3.OperationalError:
+            try:
+                conn.execute(f'ALTER TABLE applications ADD COLUMN {column_name} TEXT')
+                print(f"✅ Added {column_name} column to applications table")
+            except sqlite3.OperationalError as e:
+                print(f"⚠️ Could not add {column_name} column: {e}")
+    
+    # Check if updated_at column exists in applications table and add it if missing
+    try:
+        conn.execute("SELECT updated_at FROM applications LIMIT 1")
+        print("✅ Updated_at column already exists in applications table")
+    except sqlite3.OperationalError:
+        try:
+            conn.execute('ALTER TABLE applications ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
+            print("✅ Added updated_at column to applications table")
+        except sqlite3.OperationalError as e:
+            print(f"⚠️ Could not add updated_at column: {e}")
     
     conn.commit()
     conn.close()

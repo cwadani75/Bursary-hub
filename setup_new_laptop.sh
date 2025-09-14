@@ -105,6 +105,23 @@ setup_backend() {
     print_status "Initializing database..."
     $PYTHON_CMD init_database.py
     
+    # Verify admin user was created
+    print_status "Verifying admin user creation..."
+    $PYTHON_CMD -c "
+import sys
+sys.path.append('.')
+from database import get_db_connection
+from config import Config
+conn = get_db_connection()
+admin = conn.execute('SELECT email, role FROM users WHERE email = ?', (Config.ADMIN_EMAIL,)).fetchone()
+conn.close()
+if admin:
+    print('✅ Admin user verified:', admin[0], '- Role:', admin[1])
+else:
+    print('❌ Admin user not found!')
+    sys.exit(1)
+"
+    
     # Create environment file from template
     print_status "Creating environment configuration..."
     if [ -f "environment.txt" ]; then
@@ -125,6 +142,10 @@ DATABASE_PATH=instance/bursary.db
 JWT_SECRET_KEY=dev-secret-key
 JWT_ACCESS_TOKEN_EXPIRES=3600
 
+# Admin Configuration
+ADMIN_EMAIL=mainbursery@gmail.com
+ADMIN_PASSWORD=Admin123
+
 # Email Configuration
 EMAIL_SERVER=smtp.gmail.com
 EMAIL_PORT=587
@@ -134,12 +155,27 @@ EMAIL_PASSWORD=ltqi dinz mvcd aktl
 # Upload Configuration
 UPLOAD_FOLDER=uploads
 MAX_CONTENT_LENGTH=16777216
-ALLOWED_EXTENSIONS=png,jpg,jpeg,gif
+ALLOWED_EXTENSIONS=png,jpg,jpeg,gif,pdf
 
 # CORS Configuration
 CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174,http://localhost:5175,http://127.0.0.1:5175
 EOF
     fi
+    
+    # Test admin login functionality
+    print_status "Testing admin login functionality..."
+    $PYTHON_CMD -c "
+import sys
+sys.path.append('.')
+from models import User
+from config import Config
+admin = User.get_user_by_email(Config.ADMIN_EMAIL)
+if admin and User.verify_password(admin, Config.ADMIN_PASSWORD):
+    print('✅ Admin login test passed!')
+else:
+    print('❌ Admin login test failed!')
+    sys.exit(1)
+"
     
     print_success "Backend setup completed!"
     cd ..
@@ -207,9 +243,12 @@ main() {
     echo ""
     echo "3. Open the URL shown by npm run dev (usually http://localhost:5173 or http://localhost:5174)"
     echo ""
-    echo "🔐 Default admin credentials:"
+    echo "🔐 Admin Login Credentials:"
     echo "   Email: mainbursery@gmail.com"
     echo "   Password: Admin123"
+    echo ""
+    echo "   ⚠️  IMPORTANT: These credentials are automatically created during setup"
+    echo "   ✅ Admin user has been verified and tested"
     echo ""
     echo "⚠️  Important Notes:"
     echo "   - Backend runs on http://localhost:5001"
@@ -217,7 +256,15 @@ main() {
     echo "   - Check .env files in both directories if you encounter issues"
     echo ""
     echo "📖 For detailed instructions, see SETUP_GUIDE.md"
-    echo "🐛 For troubleshooting, check the terminal output above"
+    echo ""
+    echo "🐛 Troubleshooting Login Issues:"
+    echo "   If you get 'Admin access required' or 'Login failed':"
+    echo "   1. Make sure the backend server is running (python3 app.py)"
+    echo "   2. Check that the database was created: ls bursary-backend/instance/"
+    echo "   3. Verify admin user exists: cd bursary-backend && python3 -c \"from database import get_db_connection; from config import Config; conn = get_db_connection(); admin = conn.execute('SELECT email FROM users WHERE email = ?', (Config.ADMIN_EMAIL,)).fetchone(); print('Admin exists:', bool(admin)); conn.close()\""
+    echo "   4. If admin doesn't exist, run: cd bursary-backend && python3 init_database.py"
+    echo ""
+    echo "🐛 For other issues, check the terminal output above"
 }
 
 # Run main function

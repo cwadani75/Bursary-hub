@@ -167,7 +167,7 @@ class Report:
 
 class Application:
     @staticmethod
-    def create_application(user_id, data):
+    def create_application(user_id, data, attachments=None):
         conn = get_db_connection()
         try:
             cursor = conn.cursor()
@@ -175,13 +175,20 @@ class Application:
                 INSERT INTO applications 
                 (user_id, first_name, last_name, email, phone, id_number, gender, dob,
                  county, sub_county, ward, village, institution, course, year_of_study,
-                 fee_amount, family_income, reason)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 fee_amount, family_income, reason, fee_structure_pdf, student_id_pdf,
+                 student_national_id_pdf, parent_id_mother_pdf, parent_id_father_pdf, result_slip_pdf)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 user_id, data['firstName'], data['lastName'], data['email'], data['phone'],
                 data['idNumber'], data['gender'], data['dob'], data['county'], data['subCounty'],
                 data['ward'], data['village'], data['institution'], data['course'],
-                data['yearOfStudy'], data['feeAmount'], data['familyIncome'], data['reason']
+                data['yearOfStudy'], data['feeAmount'], data['familyIncome'], data['reason'],
+                attachments.get('feeStructurePdf') if attachments else None,
+                attachments.get('studentIdPdf') if attachments else None,
+                attachments.get('studentNationalIdPdf') if attachments else None,
+                attachments.get('parentIdMotherPdf') if attachments else None,
+                attachments.get('parentIdFatherPdf') if attachments else None,
+                attachments.get('resultSlipPdf') if attachments else None
             ))
             application_id = cursor.lastrowid
             conn.commit()

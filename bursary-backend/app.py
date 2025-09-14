@@ -689,18 +689,61 @@ def delete_report(report_id):
 def create_application():
     try:
         user_id = get_current_user()['user_id']
-        data = request.get_json()
         
-        # Validate required fields
-        required_fields = ['firstName', 'lastName', 'email', 'phone', 'idNumber', 'gender', 'dob',
-                          'county', 'subCounty', 'ward', 'village', 'institution', 'course', 
-                          'yearOfStudy', 'feeAmount', 'familyIncome', 'reason']
-        
-        for field in required_fields:
-            if not data.get(field):
-                return jsonify({'error': f'Missing required field: {field}'}), 400
-        
-        application_id = Application.create_application(user_id, data)
+        # Check if request contains files (multipart/form-data)
+        if request.files:
+            # Handle file uploads
+            data = {}
+            attachments = {}
+            
+            # Extract form data
+            for key in request.form:
+                data[key] = request.form[key]
+            
+            # Extract file attachments
+            for key in request.files:
+                file = request.files[key]
+                if file and file.filename:
+                    # Save file to uploads directory
+                    filename = secure_filename(file.filename)
+                    # Add timestamp to avoid conflicts
+                    import time
+                    timestamp = str(int(time.time()))
+                    filename = f"{timestamp}_{filename}"
+                    
+                    # Create uploads directory if it doesn't exist
+                    upload_dir = os.path.join(app.root_path, 'uploads', 'applications')
+                    os.makedirs(upload_dir, exist_ok=True)
+                    
+                    file_path = os.path.join(upload_dir, filename)
+                    file.save(file_path)
+                    attachments[key] = filename
+            
+            # Validate required fields
+            required_fields = ['firstName', 'lastName', 'email', 'phone', 'idNumber', 'gender', 'dob',
+                              'county', 'subCounty', 'ward', 'village', 'institution', 'course', 
+                              'yearOfStudy', 'feeAmount', 'familyIncome', 'reason']
+            
+            for field in required_fields:
+                if not data.get(field):
+                    return jsonify({'error': f'Missing required field: {field}'}), 400
+            
+            application_id = Application.create_application(user_id, data, attachments)
+            
+        else:
+            # Handle JSON data (backward compatibility)
+            data = request.get_json()
+            
+            # Validate required fields
+            required_fields = ['firstName', 'lastName', 'email', 'phone', 'idNumber', 'gender', 'dob',
+                              'county', 'subCounty', 'ward', 'village', 'institution', 'course', 
+                              'yearOfStudy', 'feeAmount', 'familyIncome', 'reason']
+            
+            for field in required_fields:
+                if not data.get(field):
+                    return jsonify({'error': f'Missing required field: {field}'}), 400
+            
+            application_id = Application.create_application(user_id, data)
         
         if application_id:
             return jsonify({
@@ -793,6 +836,18 @@ def delete_application(application_id):
     except Exception as e:
         print(f"Error deleting application: {e}")
         return jsonify({'error': 'Failed to delete application'}), 500
+
+
+# File serving endpoint for application attachments
+@app.route('/uploads/applications/<filename>')
+@user_required()
+def serve_application_file(filename):
+    try:
+        upload_dir = os.path.join(app.root_path, 'uploads', 'applications')
+        return send_from_directory(upload_dir, filename)
+    except Exception as e:
+        print(f"Error serving file: {e}")
+        return jsonify({'error': 'File not found'}), 404
 
 
 # ... (keep all the imports and setup code the same until the contact routes)

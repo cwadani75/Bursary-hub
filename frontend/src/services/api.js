@@ -185,11 +185,45 @@ class ApiService {
 
   // Application methods
   async createApplication(applicationData) {
-    const response = await this.request('/applications', {
-      method: 'POST',
-      body: JSON.stringify(applicationData),
-    });
-    return response;
+    // Check if applicationData is FormData (contains files)
+    if (applicationData instanceof FormData) {
+      const token = this.getToken();
+      const url = `${this.baseURL}/applications`;
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // Don't set Content-Type for FormData, let browser set it with boundary
+          },
+          body: applicationData,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            this.removeToken();
+            this.removeUser();
+            throw new Error('Session expired. Please login again.');
+          }
+          throw new Error(data.error || 'Failed to submit application');
+        }
+
+        return data;
+      } catch (error) {
+        console.error('Application Error:', error);
+        throw error;
+      }
+    } else {
+      // Handle JSON data (backward compatibility)
+      const response = await this.request('/applications', {
+        method: 'POST',
+        body: JSON.stringify(applicationData),
+      });
+      return response;
+    }
   }
 
   async getMyApplications() {
