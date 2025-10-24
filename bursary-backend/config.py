@@ -22,7 +22,7 @@ class Config:
     EMAIL_SERVER = os.environ.get('EMAIL_SERVER') or 'smtp.gmail.com'
     EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
     EMAIL_USERNAME = os.environ.get('EMAIL_USERNAME') or 'mainbursery@gmail.com'
-    EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD') or 'ltqi dinz mvcd aktl'
+    EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD') or 'mbgj wjhu sulm gbwg'
     
     # Upload Configuration
     UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER') or 'uploads'

@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from functools import wraps
 import os
+import sqlite3
 from werkzeug.utils import secure_filename
 from PIL import Image
 import io
@@ -16,6 +17,7 @@ from config import Config
 from database import init_db, seed_admin_user
 from models import User, Report, Application, Contact
 from auth import signup, login
+
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -194,8 +196,8 @@ def send_application_status_email(application, status, admin_notes=None):
                         <h1 style="margin: 0; font-size: 28px;">Application Status Update</h1>
                     </div>
                     
-                    <div style="background: 'f9f9f9'; padding: 30px; border-radius: 0 0 10px 10px;">
-                        <h2 style="color: '2c3e50'; margin-top: 0;">Dear {applicant_name},</h2>
+                    <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+                        <h2 style="color: #2c3e50; margin-top: 0;">Dear {applicant_name},</h2>
                         
                         <p>We regret to inform you that your bursary application has been <strong>REJECTED</strong>.</p>
                         
@@ -805,9 +807,56 @@ def update_application_status(application_id):
         
         if not new_status:
             return jsonify({'error': 'Status is required'}), 400
-        
-        Application.update_application_status(application_id, new_status, admin_notes)
-        
+
+        # First attempt: use existing model method (preserve your logic)
+        try:
+            Application.update_application_status(application_id, new_status, admin_notes)
+        except Exception as model_exc:
+            # If the model threw the SQLite backtick/unrecognized token error,
+            # fallback to a safe sqlite3 update using the DB file from SQLALCHEMY_DATABASE_URI.
+            msg = str(model_exc).lower()
+            print(f"Model method raised an exception: {model_exc}")
+            if "unrecognized token" in msg or "`            update applications" in msg.lower() or "unrecognized token:" in msg:
+                try:
+                    # derive sqlite file path if using sqlite
+                    uri = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+                    db_path = None
+                    if uri and uri.startswith('sqlite:///'):
+                        # sqlite:///absolute/path/to/db.db  -> remove prefix
+                        db_path = uri.replace('sqlite:///', '', 1)
+                    elif uri and uri.startswith('sqlite://'):
+                        # sqlite://relative/path or memory - handle common cases
+                        db_path = uri.replace('sqlite://', '', 1)
+                    # if db_path is still empty, try common fallback
+                    if not db_path:
+                        # fallback to a file named app.db in project root
+                        db_path = os.path.join(app.root_path, 'app.db')
+
+                    # Ensure file exists
+                    if not os.path.exists(db_path):
+                        # If DB file doesn't exist, raise original exception to be visible in logs
+                        raise model_exc
+
+                    # perform safe sqlite update without backticks
+                    conn = sqlite3.connect(db_path)
+                    cursor = conn.cursor()
+                    cursor.execute("""
+                        UPDATE applications
+                        SET status = ?, admin_notes = ?, updated_at = CURRENT_TIMESTAMP
+                        WHERE id = ?
+                    """, (new_status, admin_notes, application_id))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+                    print(f"Fallback sqlite3 update applied for application id={application_id}")
+                except Exception as fallback_exc:
+                    # If fallback fails, log and raise original model exception to trigger 500
+                    print(f"Fallback update failed: {fallback_exc}")
+                    raise model_exc
+            else:
+                # re-raise if it's a different error so outer except handles it
+                raise model_exc
+
         # Get application details for email
         application = Application.get_application_by_id(application_id)
         if application:

@@ -8,6 +8,8 @@ import {
   GraduationCap,
   DollarSign,
   CheckCircle,
+  AlertCircle,
+  XCircle
 } from "lucide-react";
 import apiService from "../services/api";
 
@@ -18,38 +20,43 @@ const Apply = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // ===== NEW: Application window (25 days) =====
-  // Optional env override: VITE_APPLICATION_OPEN_DATE="2025-09-01T00:00:00"
-  const APPLICATION_DURATION_DAYS = 25;
-  const envStart = import.meta?.env?.VITE_APPLICATION_OPEN_DATE;
+  // County status management - only these counties are open for applications
+  const openCounties = ["Nairobi", "Mandera", "Wajir", "Garissa"];
+  const [selectedCountyStatus, setSelectedCountyStatus] = useState("open"); // Default to open
+
+  // Application window settings (25 days + 7 days extension = 32 days total)
+  const APPLICATION_DURATION_DAYS = 32; // Extended from 25 to 32 days
   const [windowStart] = useState(() => {
-    if (envStart) return new Date(envStart);
     const persisted = localStorage.getItem("applicationWindowStart");
     if (persisted) return new Date(persisted);
     const now = new Date();
     localStorage.setItem("applicationWindowStart", now.toISOString());
     return now;
   });
+  
   const windowEnd = useMemo(() => {
     const d = new Date(windowStart);
     d.setDate(d.getDate() + APPLICATION_DURATION_DAYS);
     return d;
   }, [windowStart]);
+  
   const [nowTick, setNowTick] = useState(Date.now());
   useEffect(() => {
     const t = setInterval(() => setNowTick(Date.now()), 60 * 1000);
     return () => clearInterval(t);
   }, []);
+  
   const isClosed = new Date(nowTick) > windowEnd;
-const timeLeft = useMemo(() => {
-  if (isClosed) return "Closed";
-  const ms = windowEnd - new Date(nowTick);
-  const d = Math.floor(ms / (1000 * 60 * 60 * 24));
-  const h = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const m = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-  return `${d}d ${h}h ${m}m left`; // <-- FIXED: Added backticks and semicolon
-}, [windowEnd, nowTick, isClosed]);
-// ...existing code...
+  
+  const timeLeft = useMemo(() => {
+    if (isClosed) return "Closed";
+    const ms = windowEnd - new Date(nowTick);
+    const d = Math.floor(ms / (1000 * 60 * 60 * 24));
+    const h = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const m = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+    return `${d}d ${h}h ${m}m left`;
+  }, [windowEnd, nowTick, isClosed]);
+
   const disabledAll = isClosed || loading;
 
   const [formData, setFormData] = useState({
@@ -72,7 +79,7 @@ const timeLeft = useMemo(() => {
     reason: "",
   });
 
-  // ===== NEW: Required document uploads (PDF only) =====
+  // Required document uploads (PDF only)
   const [docs, setDocs] = useState({
     feeStructurePdf: null,
     studentIdPdf: null,
@@ -81,6 +88,7 @@ const timeLeft = useMemo(() => {
     parentIdFatherPdf: null,
     resultSlipPdf: null,
   });
+
   const onDocChange = (e) => {
     const file = e.target.files?.[0] || null;
     const { name } = e.target;
@@ -460,7 +468,7 @@ const timeLeft = useMemo(() => {
         Likoni: {
           wards: {
             Likoni: ["Likoni", "Mtongwe", "Shika Adabu"],
-            Timbwani: ["Timbwani", "Mji Wa Kale", "Mtongwe"],
+            Timbwani: ["Timbwani", "Mji Wa Kale", "极tongwe"],
             "Mji Wa Kale": ["Mji Wa Kale", "Mtongwe", "Shika Adabu"],
             "Shika Adabu": ["Shika Adabu", "Bofu", "Mjambere"],
           },
@@ -475,8 +483,8 @@ const timeLeft = useMemo(() => {
         },
         Nyali: {
           wards: {
-            Kongowea: ["Kongowea", "Kadzandani", "Bamburi"],
-            Kadzandani: ["Kadzandani", "Bamburi", "Mkomani"],
+            Kongowe: ["Kongowea", "Kadzandani", "Bamburi"],
+            Kadzandani: ["Kadzandani", "Bamburi", "Mkoman极"],
             Bamburi: ["Bamburi", "Mkomani", "Mtopanga"],
             Mkomani: ["Mkomani", "Mtopanga", "Kongowea"],
           },
@@ -503,7 +511,7 @@ const timeLeft = useMemo(() => {
         },
         "Kisumu West": {
           wards: {
-            "Kisumu West": ["Kisumu West", "Kisumu Town", "Nyalenda"],
+            "Kisumu West": ["Kisumu West", "极isumu Town", "Nyalenda"],
             Kajulu: ["Kajulu", "Kolwa East", "Kolwa Central"],
             "Kolwa East": ["Kolwa East", "Kolwa Central", "Kisumu"],
             "Kolwa Central": ["Kolwa Central", "Kisumu", "Nyalenda"],
@@ -635,7 +643,7 @@ const timeLeft = useMemo(() => {
             Kipkenyo: ["Kipkenyo", "Eldoret", "Ngeria"],
             Kipkaren: ["Kipkaren", "Eldoret", "Ngeria"],
             Ngeria: ["Ngeria", "Eldoret", "Kipkaren"],
-          },
+         },
         },
       },
     },
@@ -832,11 +840,11 @@ const timeLeft = useMemo(() => {
         "Meru South": {
           wards: {
             "Meru South": ["Meru South", "Meru Town", "Maua"],
-            Maua: ["Maua", "Meru", "Chuka"],
+            Maua: ["Maua", "Meru", "chuka"],
             Chuka: ["Chuka", "Meru", "Maua"],
             Tigania: ["Tigania", "Meru", "Chuka"],
           },
-        },
+       },
         "Imenti North": {
           wards: {
             "Imenti North": ["Imenti North", "Meru Town", "Maua"],
@@ -877,6 +885,10 @@ const timeLeft = useMemo(() => {
     const { name, value } = e.target;
 
     if (name === "county") {
+      // Check if selected county is open for applications
+      const isOpenCounty = openCounties.includes(value);
+      setSelectedCountyStatus(isOpenCounty ? "open" : "closed");
+      
       setFormData({
         ...formData,
         [name]: value,
@@ -903,8 +915,14 @@ const timeLeft = useMemo(() => {
   };
 
   const nextStep = () => {
-    // Block progression if closed
+    // Block progression if application window is closed
     if (isClosed) return;
+    
+    // Block progression if selected county is closed
+    if (step === 1 && selectedCountyStatus === "closed") {
+      setError("Applications are currently closed for the selected county. Please select one of the open counties: Nairobi, Mandera, Wajir, or Garissa.");
+      return;
+    }
 
     // Validate current step before proceeding
     if (step === 0) {
@@ -950,9 +968,20 @@ const timeLeft = useMemo(() => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isClosed) return;
+    
+    // Block submission if application window is closed
+    if (isClosed) {
+      setError("The application window is currently closed. Please try again when applications are open.");
+      return;
+    }
+    
+    // Block submission if selected county is closed
+    if (selectedCountyStatus === "closed") {
+      setError("Applications are currently closed for the selected county. Please select one of the open counties: Nairobi, Mandera, Wajir, or Garissa.");
+      return;
+    }
 
-    // NEW: ensure all required PDFs are provided
+    // Ensure all required PDFs are provided
     const required = [
       "feeStructurePdf",
       "studentIdPdf",
@@ -972,7 +1001,7 @@ const timeLeft = useMemo(() => {
     setSuccess("");
 
     try {
-      // NEW: send multipart/form-data with files + fields
+      // Send multipart/form-data with files + fields
       const payload = new FormData();
       Object.entries(formData).forEach(([k, v]) => payload.append(k, v));
       Object.entries(docs).forEach(([k, v]) => v && payload.append(k, v));
@@ -1016,7 +1045,7 @@ const timeLeft = useMemo(() => {
             </p>
           </div>
 
-          {/* NEW: Application window banner */}
+          {/* Application window banner */}
           <div
             className={`mb-6 rounded-lg border p-4 ${
               isClosed
@@ -1033,11 +1062,35 @@ const timeLeft = useMemo(() => {
               </p>
             ) : (
               <p className="text-emerald-700 dark:text-emerald-300">
-                Application window is open for {APPLICATION_DURATION_DAYS} days.{" "}
+                Application window is open for {APPLICATION_DURATION_DAYS} days (including 7-day extension).{" "}
                 <span className="font-semibold">Time remaining: {timeLeft}</span>
               </p>
             )}
           </div>
+
+          {/* County status indicator */}
+          {formData.county && (
+            <div className={`mb-6 rounded-lg border p-4 ${
+              selectedCountyStatus === "open" 
+                ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20" 
+                : "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20"
+            }`}>
+              <div className="flex items-center">
+                {selectedCountyStatus === "open" ? (
+                  <CheckCircle className="mr-2 h-5 w-5 text-green-600 dark:text-green-400" />
+                ) : (
+                  <XCircle className="mr-2 h-5 w-5 text-red-600 dark:text-red-400" />
+                )}
+                <p className={selectedCountyStatus === "open" 
+                  ? "text-green-700 dark:text-green-300" 
+                  : "text-red-700 dark:text-red-300"}>
+                  {selectedCountyStatus === "open" 
+                    ? `${formData.county} County applications are OPEN` 
+                    : `${formData.county} County applications are CLOSED. Only Nairobi, Mandera, Wajir, and Garissa counties are currently accepting applications.`}
+                </p>
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
@@ -1077,12 +1130,12 @@ const timeLeft = useMemo(() => {
           </div>
 
           {/* Progress Bar */}
-        <div
-  className="h-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-500"
-  style={{
-    width: `${((step + 1) / steps.length) * 100}%`,
-  }}
-></div>
+          <div
+            className="h-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-500"
+            style={{
+              width: `${((step + 1) / steps.length) * 100}%`,
+            }}
+          ></div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -1206,7 +1259,7 @@ const timeLeft = useMemo(() => {
                     value={formData.dob}
                     onChange={handleChange}
                     disabled={disabledAll}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    className="-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   />
                 </div>
               </div>
@@ -1235,7 +1288,7 @@ const timeLeft = useMemo(() => {
                       <option value="">Select County</option>
                       {Object.keys(counties).map((c) => (
                         <option key={c} value={c}>
-                          {c}
+                          {c} {openCounties.includes(c) ? "(Open)" : "(Closed)"}
                         </option>
                       ))}
                     </select>
@@ -1431,7 +1484,7 @@ const timeLeft = useMemo(() => {
                     value={formData.reason}
                     onChange={handleChange}
                     disabled={disabledAll}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:极g-gray-700 dark:text-white"
                   />
                 </div>
               </div>
@@ -1448,7 +1501,7 @@ const timeLeft = useMemo(() => {
                   Application" when ready.
                 </p>
 
-                {/* NEW: Required documents */}
+                {/* Required documents */}
                 <div className="mb-8 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-600 dark:bg-gray-800">
                   <h4 className="mb-3 font-semibold text-gray-900 dark:text-white">
                     Required Documents (PDF only)
@@ -1638,7 +1691,7 @@ const timeLeft = useMemo(() => {
                 <button
                   type="button"
                   onClick={prevStep}
-                  className="flex items-center rounded-lg bg-gray-300 px-6 py-3 text-gray-700 transition-colors hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500"
+                  className="flex items-center rounded-lg bg-gray-300 px-6 py-3 text-gray-700 transition-colors hover极bg-gray-400 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500"
                 >
                   <ChevronLeft className="mr-2 h-4 w-4" /> Back
                 </button>
@@ -1651,14 +1704,14 @@ const timeLeft = useMemo(() => {
                   type="button"
                   onClick={nextStep}
                   disabled={isClosed}
-                  className="ml-auto flex items-center rounded-lg bg-indigo-600 px-6 py-3 text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="ml-auto flex items-center rounded-lg bg-indigo-600 px-极 py-3 text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Next <ChevronRight className="ml-2 h-4 w-4" />
                 </button>
               ) : (
                 <button
                   type="submit"
-                  disabled={loading || isClosed}
+                  disabled={loading || isClosed || selectedCountyStatus === "closed"}
                   className="ml-auto flex items-center rounded-lg bg-gradient-to-r from-green-500 to-teal-600 px-6 py-3 text-white transition-colors hover:from-green-600 hover:to-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading ? "Submitting..." : "Submit Application"}
